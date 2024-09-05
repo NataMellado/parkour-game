@@ -1125,16 +1125,17 @@ GameObject:
   - component: {fileID: 6862303097144135742}
   - component: {fileID: 7723535089753975372}
   - component: {fileID: 4239014068431347858}
+  - component: {fileID: 7102150311443443921}
   - component: {fileID: 1518465732161071853}
   - component: {fileID: 6041598317911786544}
   - component: {fileID: 1066323463150572476}
   - component: {fileID: 6307036004868211280}
-  - component: {fileID: 7102150311443443921}
   - component: {fileID: 8649409706545693908}
   - component: {fileID: 187891322062601703}
-  - component: {fileID: 2913371536116285815}
+  - component: {fileID: 3131148493983891934}
+  - component: {fileID: 1571629057180137604}
   m_Layer: 8
-  m_Name: PlayerArmature
+  m_Name: JugadorPrefab
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1169,7 +1170,7 @@ Animator:
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 36078ab0369161e49a29d349ae3e0739, type: 3}
   m_Controller: {fileID: 9100000, guid: 40db3173a05ae3242b1c182a09b0a183, type: 2}
-  m_CullingMode: 1
+  m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
@@ -1196,7 +1197,7 @@ CharacterController:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Height: 1.8
   m_Radius: 0.28
@@ -1205,6 +1206,27 @@ CharacterController:
   m_SkinWidth: 0.02
   m_MinMoveDistance: 0
   m_Center: {x: 0, y: 0.93, z: 0}
+--- !u!114 &7102150311443443921
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4802217115245809297}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 3853544205
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!114 &1518465732161071853
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1212,7 +1234,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4802217115245809297}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 26e54e5a728a9234ab24fcf1460ed8a2, type: 3}
   m_Name: 
@@ -1384,27 +1406,6 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
---- !u!114 &7102150311443443921
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4802217115245809297}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3853544205
-  InScenePlacedSourceGlobalObjectIdHash: 0
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
 --- !u!114 &8649409706545693908
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1438,9 +1439,9 @@ MonoBehaviour:
   SyncRotAngleX: 1
   SyncRotAngleY: 1
   SyncRotAngleZ: 1
-  SyncScaleX: 0
-  SyncScaleY: 0
-  SyncScaleZ: 0
+  SyncScaleX: 1
+  SyncScaleY: 1
+  SyncScaleZ: 1
   PositionThreshold: 0.001
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
@@ -1450,7 +1451,7 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
---- !u!114 &2913371536116285815
+--- !u!114 &3131148493983891934
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1459,10 +1460,34 @@ MonoBehaviour:
   m_GameObject: {fileID: 4802217115245809297}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a180569f49fb0a04ca368cb709e08cbe, type: 3}
+  m_Script: {fileID: 11500000, guid: c80182f3bdf9452468c854ac4d40cdf5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  remoteOnly: []
+  parkourActions:
+  - {fileID: 11400000, guid: 223f5be601a326e499507660de8bcf89, type: 2}
+  - {fileID: 11400000, guid: b6b1b7007d8a5cc4b8b5574cf9d55310, type: 2}
+  - {fileID: 11400000, guid: baaeb28ba518a9a4b9859f1bf5f4f260, type: 2}
+  - {fileID: 11400000, guid: e1e1f75e2bda90c429c6435ded93f0f6, type: 2}
+  CrossFadeTime: 0.08
+  inAction: 0
+--- !u!114 &1571629057180137604
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4802217115245809297}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2b9541919d868a4d83096813e740695, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  forwardRayOffset: {x: 0, y: 0.25, z: 0}
+  forwardRayLength: 0.8
+  heightRayLength: 5
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 8
 --- !u!1 &4986924868958043927
 GameObject:
   m_ObjectHideFlags: 0

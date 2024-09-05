@@ -25,7 +25,7 @@ public class PlayerPresentation : NetworkBehaviour
 
     private void OnChangedOwner(bool v){
         if (v){
-            GetComponentInChildren<AudioListener>().enabled = true;
+            //GetComponentInChildren<AudioListener>().enabled = true;
             GetComponent<ThirdPersonController>().enabled = true;
             GetComponent<CharacterController>().enabled = true;
             GetComponent<ClientNetworkTransform>().enabled = true;
