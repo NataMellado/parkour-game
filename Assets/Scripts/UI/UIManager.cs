@@ -21,7 +21,6 @@ public class UIManager : MonoBehaviour
     private GameManager gameManager;
 
     public bool pauseMenu = true;
-    private bool isConnected = false;
     public KeyCode toggleKey = KeyCode.Escape;
 
     public Camera gameCamera;
