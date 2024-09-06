@@ -16,7 +16,7 @@ MonoBehaviour:
   obstacleTag: 
   minHeigh: 1.76
   maxHeigh: 2.5
-  rotateToObstacle: 1
+  rotateToObstacle: 0
   postActionDelay: 0.35
   enableTargetMatching: 1
   matchBodyPart: 5

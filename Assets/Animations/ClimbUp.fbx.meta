@@ -544,18 +544,18 @@ ModelImporter:
         length: 0
         modified: 0
     skeleton:
-    - name: Kachujin G Rosales(Clone)
+    - name: Kachujin(Clone)
       parentName: 
       position: {x: 0, y: 0, z: 0}
       rotation: {x: 0, y: 0, z: 0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Kachujin
-      parentName: Kachujin G Rosales(Clone)
+      parentName: Kachujin(Clone)
       position: {x: -0, y: 0, z: 0}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: mixamorig:Hips
-      parentName: Kachujin G Rosales(Clone)
+      parentName: Kachujin(Clone)
       position: {x: -0.0007293723, y: 1.1404332, z: 0.010428437}
       rotation: {x: 3.6500364e-14, y: 0.000000003988351, z: -0.000001003189, w: 1}
       scale: {x: 1, y: 1, z: 1}
@@ -948,7 +948,7 @@ ModelImporter:
     hasTranslationDoF: 0
     hasExtraRoot: 1
     skeletonHasParents: 1
-  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: 4676293e864e49b47946c2ee87a081e0,
+  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: 5447b647e626fa64892d85fdb5ba6fe0,
     type: 3}
   autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 3

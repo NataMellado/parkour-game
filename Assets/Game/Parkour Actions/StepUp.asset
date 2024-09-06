@@ -16,10 +16,10 @@ MonoBehaviour:
   obstacleTag: 
   minHeigh: 0.3
   maxHeigh: 0.8
-  rotateToObstacle: 1
+  rotateToObstacle: 0
   postActionDelay: 0
   enableTargetMatching: 1
   matchBodyPart: 3
-  matchStartTime: 0.358
-  matchTargetTime: 0.523
+  matchStartTime: 0.01
+  matchTargetTime: 0.2
   matchPosWeight: {x: 0, y: 1, z: 0}
