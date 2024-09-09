@@ -443,7 +443,7 @@ PrefabInstance:
     - target: {fileID: 4802217115245809297, guid: f90488ad01bcb764ab17166da3749833,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6862303097144135742, guid: f90488ad01bcb764ab17166da3749833,
         type: 3}
@@ -811,7 +811,7 @@ PrefabInstance:
     - target: {fileID: 4802217115245809297, guid: 4ceac5279c9600c45ba8572b962c7c98,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6862303097144135742, guid: 4ceac5279c9600c45ba8572b962c7c98,
         type: 3}
@@ -3127,7 +3127,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1854956995}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -4275,7 +4275,7 @@ PrefabInstance:
     - target: {fileID: 4661902715224879652, guid: 7fe2650458c9e1d42ae68bfbfa42bf94,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4727166796257748578, guid: 7fe2650458c9e1d42ae68bfbfa42bf94,
         type: 3}
