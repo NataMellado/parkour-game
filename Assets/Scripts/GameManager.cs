@@ -13,6 +13,7 @@ namespace Tbvl.GameManager
 
         [SerializeField]
         public TMP_InputField serverIpText;
+        private bool isConnecting = false;
         public bool IsConnected
         {
             get => isConnected;
@@ -66,7 +67,8 @@ namespace Tbvl.GameManager
 
         public void StartClient()
         {
-
+            if (isConnecting)
+                return;
             // Obtener texto desde el objeto serverIpText (InputField)
             string serverIp = (serverIpText.text == "" || 
                 serverIpText.text.Trim() == "" ||
@@ -82,8 +84,9 @@ namespace Tbvl.GameManager
             Debug.Log("Conectando a " + serverIp + ":" + serverPort);
             try
             {
-                NetworkManager.Singleton.StartClient();
-                StartCoroutine(WaitForConnection());
+                    NetworkManager.Singleton.StartClient();
+                    StartCoroutine(WaitForConnectionToHappen());
+                    Debug.LogWarning("Ya se está intentando conectar");
             }catch (Exception ex)
             {
                 Debug.LogError($"Ocurrió un error en StartClient de GameManager!: {ex}");
@@ -120,13 +123,43 @@ namespace Tbvl.GameManager
             NetworkManager.Singleton.Shutdown();
         }
 
+        private IEnumerator WaitForConnectionToHappen()
+        {
+            if (isConnecting)
+                yield break;
+            isConnecting = true;
+            float timeout = 5f;
+            float timer = 0f;
+
+            while (!IsConnected && timer < timeout)
+            {
+                timer += Time.deltaTime;
+                yield return null;
+            }
+            if (IsConnected)
+            {
+                //Debug.Log("Conectado al servidor");
+            }else
+            {
+                Debug.LogWarning("No se pudo conectar al servidor");
+                if (!NetworkManager.Singleton.ShutdownInProgress)
+                {
+                    NetworkManager.Singleton.Shutdown();
+                    isConnecting = false;
+                }
+            }
+        }
+
         private IEnumerator WaitForConnection()
         {
+
             // Espera hasta que el cliente esté conectado
             yield return new WaitUntil(() => IsConnected);
 
             Debug.Log("Conectado al servidor");
             IsConnected = true;
         }
+
+
     }
 }
