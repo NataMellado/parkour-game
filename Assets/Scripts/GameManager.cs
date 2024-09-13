@@ -2,11 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
+using TMPro;
+using System;
 
 namespace Tbvl.GameManager
 {
     public class GameManager : MonoBehaviour
     {
+
+        [SerializeField]
+        public TMP_InputField serverIpText;
         public bool IsConnected
         {
             get => isConnected;
@@ -58,10 +64,62 @@ namespace Tbvl.GameManager
             StartCoroutine(WaitForConnection());
         }
 
-        public void StartClient(){
-            NetworkManager.Singleton.StartClient();
-            StartCoroutine(WaitForConnection());
+        public void StartClient()
+        {
+
+            // Obtener texto desde el objeto serverIpText (InputField)
+            string serverIp = (serverIpText.text == "" || 
+                serverIpText.text.Trim() == "" ||
+                serverIpText.text.Trim() == null) ? "127.0.0.1" : serverIpText.text;
+            ushort serverPort = 7777;
+
+            // Configura la IP y el puerto del servidor
+            NetworkManager.Singleton.GetComponent<UnityTransport>()
+                .SetConnectionData(
+                    serverIp,
+                    serverPort,
+                    "0.0.0.0");
+            Debug.Log("Conectando a " + serverIp + ":" + serverPort);
+            try
+            {
+                NetworkManager.Singleton.StartClient();
+                StartCoroutine(WaitForConnection());
+            }catch (Exception ex)
+            {
+                Debug.LogError($"Ocurrió un error en StartClient de GameManager!: {ex}");
+            } 
+
         }
+
+        public bool ValidateServerAddress(string ip)
+        {
+            bool valid = false;
+            string[] separatedIp = ip.Split('.');
+
+            if (separatedIp.Length == 4)
+            {
+                valid = true;
+                foreach (string part in separatedIp)
+                {
+                    if (!byte.TryParse(part, out byte result))
+                    {
+                        valid = false;
+                        break;
+                    }
+                }
+            }
+
+
+            return valid;
+        }
+
+        public void Disconnect()
+        {
+            if (!IsConnected)
+                return;
+            NetworkManager.Singleton.Shutdown();
+        }
+
         private IEnumerator WaitForConnection()
         {
             // Espera hasta que el cliente esté conectado
