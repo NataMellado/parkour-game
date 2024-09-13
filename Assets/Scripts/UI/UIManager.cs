@@ -84,14 +84,7 @@ public class UIManager : MonoBehaviour
             pauseMenu = true;
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
-
-            // Se reemplaza el método SwitchToMenuCamera() por:
-            Debug.Log("Switching to menu camera");
-            menuCamera.gameObject.SetActive(true);
-            // Habilitar audio listener de la cámara
-            menuCamera.GetComponent<AudioListener>().enabled = false;
-            gameCamera.gameObject.SetActive(true);
-            ShowUICanvas();
+            SwitchToMenuCamera();
         }
     }
 
