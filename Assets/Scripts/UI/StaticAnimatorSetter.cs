@@ -16,7 +16,9 @@ public class StaticAnimatorSetter : MonoBehaviour
 
     private void Start()
     {
-        animator.SetInteger("Anim", animNumber);
+        //animator.SetInteger("Anim", animNumber);
+
+
     }
 
 }

@@ -5,6 +5,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using Tbvl.GameManager;
 using UnityEngine.Rendering;
+using Unity.Netcode.Transports.UTP;
+using TMPro;
+using UnityEngine.InputSystem;
+using StarterAssets;
 
 public class UIManager : MonoBehaviour
 {
@@ -14,6 +18,12 @@ public class UIManager : MonoBehaviour
 
     [SerializeField]
     private Button clientButton;
+
+    [SerializeField]
+    private Button connectButton;
+
+    [SerializeField]
+    private Button disconnectButton;
 
     [SerializeField]
     private Canvas mainMenuCanvas;
@@ -26,11 +36,19 @@ public class UIManager : MonoBehaviour
     public Camera gameCamera;
     public Camera menuCamera;
 
+    private PlayerInput playerInput;
+
+    private bool isConnected = false;
+
+
 
     private void Awake() {
         hostButton.onClick.AddListener(OnHostClicked);
         clientButton.onClick.AddListener(OnClientClicked);
+        connectButton.onClick.AddListener(OnConnectClicked);
+        disconnectButton.onClick.AddListener(OnDisconnectClicked);
         gameManager = FindObjectOfType<GameManager>();
+
 
         // Suscribir a cambios en la conexión
         gameManager.OnConnectionStateChanged += HandleConnectionStateChanged;
@@ -45,45 +63,103 @@ public class UIManager : MonoBehaviour
     }
 
     // Callback para cuando cambia el estado de la conexión
-    private void HandleConnectionStateChanged(bool isConnected)
+    private void HandleConnectionStateChanged(bool Connected)
     {
-        if (isConnected)
+        if (Connected)
         {
+            isConnected = true;
+            if (isConnected)
+            {
+                var jugadorLocal = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
+                playerInput = jugadorLocal.GetComponent<PlayerInput>();
+            }
             // Jugador conectado
-            SwitchToGameCamera();
-        }else
+            togglePauseMenu();
+            // Buscar playerInput en el jugador local
+        }
+        else
         {
             // Jugador desconectado
+            isConnected = false;
+            pauseMenu = true;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
             SwitchToMenuCamera();
         }
     }
 
-    private void OnHostClicked(){
+    
+
+    private void OnHostClicked()
+    {
+        // Si está jugando, que no haga nada
+        if (isConnected)
+            return;
         Debug.Log("Host clicked");
         gameManager.StartHost();
-        HideUICanvas();
     }
 
-    private void OnClientClicked(){
+    private void OnClientClicked()
+    {
+        // Si está jugando, que no haga nada
+        if (isConnected)
+            return;
         Debug.Log("Client clicked");
         gameManager.StartClient();
-        HideUICanvas();
+    }
+
+    private void OnConnectClicked()
+    {
+        // Si está jugando, que no haga nada
+        if (isConnected)
+            return;
+
+        Debug.Log("Connect clicked");
+
+        // Check if server ip input field is empty
+        if (gameManager.serverIpText.text.Trim() == "")
+        {
+            Debug.LogError("Server IP is empty");
+            return;
+        }
+
+        gameManager.StartClient();
+    }
+    private void OnDisconnectClicked()
+    {
+        // Si está jugando, que no haga nada
+        if (!isConnected)
+            return;
+
+        Debug.Log("Disconnect clicked");
+
+        gameManager.Disconnect();
     }
     private void HideUICanvas(){
         mainMenuCanvas.gameObject.SetActive(false);
     }
+
+    private void ShowUICanvas()
+    {
+        mainMenuCanvas.gameObject.SetActive(true);
+    }
     private void SwitchToGameCamera()
     {
         Debug.Log("Switching to game camera");
+        // Cambiar cámaras
         gameCamera.gameObject.SetActive(true);
         menuCamera.gameObject.SetActive(false);
+        HideUICanvas();
     }
 
     private void SwitchToMenuCamera()
     { 
         Debug.Log("Switching to menu camera");
         menuCamera.gameObject.SetActive(true);
+        // Habilitar audio listener de la cámara
+        menuCamera.GetComponent<AudioListener>().enabled = true;
         gameCamera.gameObject.SetActive(false);
+        ShowUICanvas();
     }
     private void togglePauseMenu()
     {
@@ -92,11 +168,16 @@ public class UIManager : MonoBehaviour
         if (pauseMenu)
         {
             SwitchToMenuCamera();
+            Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
+            playerInput.enabled = false;
         }
         else
         {
             SwitchToGameCamera();
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+            playerInput.enabled = true;
         }
     }
 
@@ -104,7 +185,7 @@ public class UIManager : MonoBehaviour
 
 
         // Si presiona la tecla A, el cursor se muestra
-        if (Input.GetKeyDown(toggleKey))
+        if (Input.GetKeyDown(toggleKey) && isConnected)
         {
             Debug.Log("Toggle pause menu");
             togglePauseMenu();
