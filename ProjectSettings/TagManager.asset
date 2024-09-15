@@ -6,6 +6,7 @@ TagManager:
   tags:
   - CinemachineTarget
   - SpawnPoint
+  - Fence
   layers:
   - Default
   - TransparentFX
