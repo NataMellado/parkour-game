@@ -164,7 +164,11 @@ namespace StarterAssets
                 // El GameObject PlayerCameraRoot se encuentra en el prefab del jugador
                 // asignado así public GameObject CinemachineCameraTarget
                 _cinemachineVirtualCamera.Follow = CinemachineCameraTarget.transform;
-                
+                if (_mainCamera == null)
+                {
+                    Debug.LogError("Cámara principal no encontrada");
+                    _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
+                }
             }
         }
 

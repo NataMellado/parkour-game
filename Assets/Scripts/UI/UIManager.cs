@@ -85,6 +85,8 @@ public class UIManager : MonoBehaviour
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
             SwitchToMenuCamera();
+            gameCamera.gameObject.SetActive(true);
+            gameCamera.GetComponent<AudioListener>().enabled = false;
         }
     }
 
@@ -127,7 +129,7 @@ public class UIManager : MonoBehaviour
     }
     private void OnDisconnectClicked()
     {
-        // Si está jugando, que no haga nada
+        // Si no está jugando, que no haga nada
         if (!isConnected)
             return;
 
@@ -148,6 +150,9 @@ public class UIManager : MonoBehaviour
         Debug.Log("Switching to game camera");
         // Cambiar cámaras
         gameCamera.gameObject.SetActive(true);
+        gameCamera.GetComponent<AudioListener>().enabled = true;
+
+        menuCamera.GetComponent<AudioListener>().enabled = false;
         menuCamera.gameObject.SetActive(false);
         HideUICanvas();
     }
@@ -158,6 +163,8 @@ public class UIManager : MonoBehaviour
         menuCamera.gameObject.SetActive(true);
         // Habilitar audio listener de la cámara
         menuCamera.GetComponent<AudioListener>().enabled = true;
+
+        gameCamera.GetComponent<AudioListener>().enabled = false;
         gameCamera.gameObject.SetActive(false);
         ShowUICanvas();
     }
