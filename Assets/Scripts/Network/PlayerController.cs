@@ -1,11 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using StarterAssets;
+using Tbvl.GameManager.Gameplay;
+using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 
 public class PlayerPresentation : NetworkBehaviour
 {
+
+    [Header("Información Jugador")]
+    public Team playerTeam;
+    public string playerName;
+
     private NetworkObject networkObject;
 
     [SerializeField]
@@ -48,5 +55,16 @@ public class PlayerPresentation : NetworkBehaviour
 
     private void Update() {
         prevIsOwner = IsOwner;
+    }
+
+
+    private void Start()
+    {
+        AsignarEquipo(playerTeam);
+    }
+
+    public void AsignarEquipo(Team team)
+    {
+        playerTeam = team;
     }
 }
