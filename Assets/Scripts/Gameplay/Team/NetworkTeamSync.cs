@@ -9,7 +9,6 @@ public class NetworkTeamSync : NetworkBehaviour
 {
 
     [Header("Componentes UI")]
-    [SerializeField] public TextMeshPro nombreJugadorText;
     [SerializeField] public TextMeshPro equipoJugadorText;
 
     public NetworkVariable<Team> playerTeam = new NetworkVariable<Team>();

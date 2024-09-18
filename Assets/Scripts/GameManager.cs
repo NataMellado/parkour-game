@@ -13,6 +13,9 @@ namespace Tbvl.GameManager
 
         [SerializeField]
         public TMP_InputField serverIpText;
+
+        [SerializeField]
+        public TMP_InputField playernameInputField;
         public bool IsConnected
         {
             get => isConnected;

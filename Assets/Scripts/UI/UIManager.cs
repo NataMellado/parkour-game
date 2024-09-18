@@ -27,7 +27,7 @@ public class UIManager : MonoBehaviour
 
     [SerializeField]
     private Canvas mainMenuCanvas;
-    
+
     private GameManager gameManager;
 
     public bool pauseMenu = true;
