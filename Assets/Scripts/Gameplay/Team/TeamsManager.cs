@@ -27,8 +27,9 @@ public class TeamsManager : MonoBehaviour
     {
         teams = new Dictionary<Team, TeamProperties>
         {
-            {Team.Policias, new TeamProperties("Policias", Color.blue, "P")},
-            {Team.Ladrones, new TeamProperties("Ladrones", Color.red, "L")}
+            {Team.SinEquipo, new TeamProperties("Sin Equipo", Color.white, "[?]")},
+            {Team.Policias, new TeamProperties("Policias", Color.blue, "[P]")},
+            {Team.Ladrones, new TeamProperties("Ladrones", Color.red, "[L]")}
         };
     }
 

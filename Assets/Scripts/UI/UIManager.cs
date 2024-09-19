@@ -28,10 +28,16 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private Canvas mainMenuCanvas;
 
+    [SerializeField]
+    private Canvas consoleCanvas;
+
     private GameManager gameManager;
 
     public bool pauseMenu = true;
     public KeyCode toggleKey = KeyCode.Escape;
+
+    public bool isConsole = false;
+    public KeyCode toggleConsoleKey = KeyCode.F9;
 
     public Camera gameCamera;
     public Camera menuCamera;
@@ -48,7 +54,7 @@ public class UIManager : MonoBehaviour
         connectButton.onClick.AddListener(OnConnectClicked);
         disconnectButton.onClick.AddListener(OnDisconnectClicked);
         gameManager = FindObjectOfType<GameManager>();
-
+        consoleCanvas.gameObject.SetActive(false);
 
         // Suscribir a cambios en la conexión
         gameManager.OnConnectionStateChanged += HandleConnectionStateChanged;
@@ -187,6 +193,30 @@ public class UIManager : MonoBehaviour
             playerInput.enabled = true;
         }
     }
+    private void toggleConsole()
+    {
+        isConsole = !isConsole;
+
+        if (isConsole)
+        {
+            consoleCanvas.gameObject.SetActive(true);
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+            if (isConnected)
+            playerInput.enabled = false;
+        }
+        else
+        {
+            consoleCanvas.gameObject.SetActive(false);
+
+            if (isConnected)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+                playerInput.enabled = true;
+            }
+        }
+    }
 
     private void Update() {
 
@@ -196,6 +226,14 @@ public class UIManager : MonoBehaviour
         {
             Debug.Log("Toggle pause menu");
             togglePauseMenu();
+        }
+
+        if (Input.GetKeyDown(toggleConsoleKey))
+        {
+
+            Debug.Log("Toggle console");
+            // Mostrar/ocultar la consola
+            toggleConsole();
         }
     }
     

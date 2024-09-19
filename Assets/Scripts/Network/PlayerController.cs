@@ -10,7 +10,6 @@ public class PlayerPresentation : NetworkBehaviour
 {
 
     [Header("Información Jugador")]
-    public Team playerTeam;
     public string playerName;
 
     private NetworkObject networkObject;
@@ -55,16 +54,5 @@ public class PlayerPresentation : NetworkBehaviour
 
     private void Update() {
         prevIsOwner = IsOwner;
-    }
-
-
-    private void Start()
-    {
-        AsignarEquipo(playerTeam);
-    }
-
-    public void AsignarEquipo(Team team)
-    {
-        playerTeam = team;
     }
 }

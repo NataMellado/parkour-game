@@ -7,22 +7,22 @@ using UnityEngine;
 
 public class NetworkTeamSync : NetworkBehaviour
 {
-
     [Header("Componentes UI")]
     [SerializeField] public TextMeshPro equipoJugadorText;
 
-    public NetworkVariable<Team> playerTeam = new NetworkVariable<Team>();
+    public NetworkVariable<Team> playerTeam = new NetworkVariable<Team>(Team.SinEquipo);
     public override void OnNetworkSpawn()
     {
         Debug.Log("Network spawn");
-        if (IsServer)
+        if (!IsServer)
         {
-            AsignarTeam();
-            Debug.Log("El jugador " + OwnerClientId + " se unió al equipo " + playerTeam.Value);
+            ActualizarUIJugador(Team.SinEquipo);
         }
 
         playerTeam.OnValueChanged += OnTeamChanged;
-        ActualizarUIJugador(playerTeam.Value);
+        EstablecerEquipoJugadorServerRpc(Team.SinEquipo);
+        //AsignarTeam();
+        //Debug.Log("El jugador " + OwnerClientId + " se unió al equipo " + playerTeam.Value);
     }
 
     private void OnDestroy()
@@ -41,7 +41,7 @@ public class NetworkTeamSync : NetworkBehaviour
         ActualizarUIJugador(newTeam);
     }
 
-    private void ActualizarUIJugador(Team team)
+    public void ActualizarUIJugador(Team team)
     {
         Debug.Log("Actualizando UI jugador");
         // Obtener las propiedades del equipo
@@ -55,6 +55,13 @@ public class NetworkTeamSync : NetworkBehaviour
                 equipoJugadorText.color = teamProperties.TeamColor;
             }
         }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void EstablecerEquipoJugadorServerRpc(Team newTeam, ServerRpcParams rpcParams = default)
+    {
+        // Actualizar el equipo del jugador en el servidor
+        playerTeam.Value = newTeam;
     }
 
 }   

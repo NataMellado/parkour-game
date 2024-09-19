@@ -7,6 +7,7 @@ namespace Tbvl.GameManager.Gameplay
 {
     public enum Team
     {
+        SinEquipo,
         Policias,
         Ladrones
     }
