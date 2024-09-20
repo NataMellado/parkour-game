@@ -16,8 +16,9 @@ public class NetworkPlayerSync : NetworkBehaviour
     [SerializeField] public TextMeshPro nombreJugadorText;
 
     public NetworkVariable<NetworkString> networkPlayerName = new NetworkVariable<NetworkString>("Jugador", NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        //NetworkVariableReadPermission.Everyone,
-        //NetworkVariableWritePermission.Server 
+    public NetworkVariable<NetworkString> player_rconPassword = new NetworkVariable<NetworkString>("", NetworkVariableReadPermission.Owner, NetworkVariableWritePermission.Owner);
+    //NetworkVariableReadPermission.Everyone,
+    //NetworkVariableWritePermission.Server 
     private void Awake()
     {
 

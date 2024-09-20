@@ -1,10 +1,12 @@
 using System.Collections;
 using Tbvl.GameManager.Gameplay;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 
 public class ServerManager : MonoBehaviour
 {
+    UnityTransport transport;
     void Start()
     {
         string[] args = System.Environment.GetCommandLineArgs();
@@ -22,11 +24,20 @@ public class ServerManager : MonoBehaviour
                 Debug.Log("======================= MODO SERVIDOR INICIADO ========================");
                 Debug.Log("======================= MODO SERVIDOR INICIADO ========================");
 
-                NetworkManager.Singleton.StartServer();
+                transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
+                if (transport != null)
+                {
+                    transport.MaxSendQueueSize = 8192;
+                    // ajustar timeouts
+                    //NetworkManager.Singleton.NetworkConfig.timeout ¿? ¿? = 10000;
+                    NetworkManager.Singleton.NetworkConfig.TickRate = 30;
 
-                NetworkManager.Singleton.OnClientConnectedCallback += MensajeConexionCliente;
+                    NetworkManager.Singleton.StartServer();
 
-                StartCoroutine(PingearClientes());            
+                    NetworkManager.Singleton.OnClientConnectedCallback += MensajeConexionCliente;
+
+                    StartCoroutine(PingearClientes());            
+                }
             }
         }
 
@@ -38,17 +49,14 @@ public class ServerManager : MonoBehaviour
     public void MensajeConexionCliente(ulong idConexion)
     {
         Debug.Log(idConexion + " se ha conectado");
-        Debug.Log(idConexion + " se ha conectado");
-        Debug.Log(idConexion + " se ha conectado");
-        Debug.Log(idConexion + " se ha conectado");
     }
     public IEnumerator PingearClientes()
     {
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(20f);
 
         while (NetworkManager.Singleton.IsServer)
         {
-            yield return new WaitForSeconds(5f);
+            yield return new WaitForSeconds(20f);
             Debug.Log("Enviando ping....");
             PingClientRpc();
         }
@@ -68,8 +76,6 @@ public class ServerManager : MonoBehaviour
     [ClientRpc]
     public void PingClientRpc()
     {
-        Debug.Log("Ping recibido desde el servidor!");
-        Debug.Log("Ping recibido desde el servidor!");
         Debug.Log("Ping recibido desde el servidor!");
     }
 
@@ -99,19 +105,19 @@ public class ServerManager : MonoBehaviour
                 // Cambiar el equipo del jugador
                 Team newTeam = currentTeam == Team.Policias ? Team.Ladrones : Team.Policias;
                 // Actualizar el equipo del jugador
-                playerTeamSync.EstablecerEquipoJugadorServerRpc(newTeam);
+                playerTeamSync.playerTeam.Value = newTeam;
                 NotificarCambioEquipoJugadorClientRpc(newTeam);
             }
         }
     }
 
-    [ClientRpc]
-    public void ActualizarEquipoClientRpc(Team team) 
-    {
-        Debug.Log("Actualizando equipo a: " + team);
-        // ActualizarUIJugador en el jugador
-        GetComponent<NetworkTeamSync>().ActualizarUIJugador(team);
-    }
+    //[ClientRpc]
+    //public void ActualizarEquipoClientRpc(Team team) 
+    //{
+    //    Debug.Log("Actualizando equipo a: " + team);
+    //    // ActualizarUIJugador en el jugador
+    //    GetComponent<NetworkTeamSync>().ActualizarUIJugador(team);
+    //}
 
     public void AsignarEquipoJugadores(Team newTeam)
     {
@@ -126,7 +132,7 @@ public class ServerManager : MonoBehaviour
             if (playerTeamSync != null)
             {
                 // Asignar el equipo al jugador
-                playerTeamSync.EstablecerEquipoJugadorServerRpc(newTeam);
+                playerTeamSync.playerTeam.Value = newTeam;
             }
         }
         NotificarCambioEquipoJugadorClientRpc(newTeam);

@@ -46,6 +46,8 @@ public class UIManager : MonoBehaviour
 
     private bool isConnected = false;
 
+    CommandInterface commandInterface;
+
 
 
     private void Awake() {
@@ -58,6 +60,9 @@ public class UIManager : MonoBehaviour
 
         // Suscribir a cambios en la conexión
         gameManager.OnConnectionStateChanged += HandleConnectionStateChanged;
+
+        // Obtener commandInterface
+        commandInterface = CommandManager.Instance.GetComponent<CommandInterface>();
     }
     private void OnDestroy()
     {
@@ -204,6 +209,9 @@ public class UIManager : MonoBehaviour
             Cursor.visible = true;
             if (isConnected)
             playerInput.enabled = false;
+
+            // select text input instantly
+            commandInterface.commandInputField.ActivateInputField();
         }
         else
         {

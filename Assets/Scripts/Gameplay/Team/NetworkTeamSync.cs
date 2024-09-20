@@ -10,7 +10,9 @@ public class NetworkTeamSync : NetworkBehaviour
     [Header("Componentes UI")]
     [SerializeField] public TextMeshPro equipoJugadorText;
 
-    public NetworkVariable<Team> playerTeam = new NetworkVariable<Team>(Team.SinEquipo);
+    public static Team defaultTeam = Team.SinEquipo;
+
+    public NetworkVariable<Team> playerTeam = new NetworkVariable<Team>(defaultTeam);
     public override void OnNetworkSpawn()
     {
         Debug.Log("Network spawn");
@@ -20,7 +22,7 @@ public class NetworkTeamSync : NetworkBehaviour
         }
 
         playerTeam.OnValueChanged += OnTeamChanged;
-        EstablecerEquipoJugadorServerRpc(Team.SinEquipo);
+        OnTeamChanged(defaultTeam, playerTeam.Value);
         //AsignarTeam();
         //Debug.Log("El jugador " + OwnerClientId + " se unió al equipo " + playerTeam.Value);
     }
@@ -38,6 +40,7 @@ public class NetworkTeamSync : NetworkBehaviour
 
     private void OnTeamChanged(Team oldTeam, Team newTeam)
     {
+        Debug.Log("El equipo del jugador ha cambiado de " + oldTeam.ToString() + " a " + newTeam.ToString());
         ActualizarUIJugador(newTeam);
     }
 
@@ -57,11 +60,11 @@ public class NetworkTeamSync : NetworkBehaviour
         }
     }
 
-    [ServerRpc(RequireOwnership = false)]
-    public void EstablecerEquipoJugadorServerRpc(Team newTeam, ServerRpcParams rpcParams = default)
-    {
-        // Actualizar el equipo del jugador en el servidor
-        playerTeam.Value = newTeam;
-    }
+    //[ServerRpc(RequireOwnership = false)]
+    //public void EstablecerEquipoJugadorServerRpc(Team newTeam, ServerRpcParams rpcParams = default)
+    //{
+    //    // Actualizar el equipo del jugador en el servidor
+    //    playerTeam.Value = newTeam;
+    //}
 
 }   

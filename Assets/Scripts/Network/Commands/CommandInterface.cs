@@ -8,9 +8,13 @@ using UnityEngine.UI;
 public class CommandInterface : MonoBehaviour
 {
     [SerializeField]
-    private TMP_InputField commandInputField;
+    public TMP_InputField commandInputField;
     [SerializeField]
     private Button sendCommandButton;
+
+    [SerializeField]
+    private TMP_Text consoleLogText;
+
     private string storedCommand = "";
     ulong clientId;
     private void Start()
@@ -23,6 +27,8 @@ public class CommandInterface : MonoBehaviour
         }
         // Si el InputField pierde el foco, guarda el valor actual
         commandInputField.onDeselect.AddListener(OnCommandFieldDeselected);
+        commandInputField.onSubmit.AddListener(OnSubmitCommandInputField);
+
         sendCommandButton.onClick.AddListener(OnSubmitCommand);
     }
 
@@ -30,6 +36,23 @@ public class CommandInterface : MonoBehaviour
     {
         string command = commandInputField.text;
         CommandManager.Instance.ExecuteCommand(clientId, command);
+
+        if (command.ToString().Trim() != "")
+        {
+            consoleLogText.text += command + "\n";
+        }
+        storedCommand = commandInputField.text;
+    }
+    public void OnSubmitCommandInputField(string str)
+    {
+        if (Input.GetKeyDown(KeyCode.Escape)) { return; }
+        string command = commandInputField.text;
+        CommandManager.Instance.ExecuteCommand(clientId, command);
+
+        if (command.ToString().Trim() != "")
+        {
+            consoleLogText.text += command + "\n";
+        }
     }
 
     private void OnCommandFieldDeselected(string text)

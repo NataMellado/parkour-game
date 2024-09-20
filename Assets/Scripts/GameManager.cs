@@ -29,12 +29,15 @@ namespace Tbvl.GameManager
             }
         }
 
+        MainHNSGameLogic mainHNSGameLogic;
+
         private bool isConnected = false;
 
         public event System.Action<bool> OnConnectionStateChanged;
 
         public void Start()
         {
+            mainHNSGameLogic = FindObjectOfType<MainHNSGameLogic>();
             NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected;
             NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnected;
 
