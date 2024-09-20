@@ -1,4 +1,5 @@
 using System.Collections;
+using Tbvl.GameManager;
 using Tbvl.GameManager.Gameplay;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
@@ -7,8 +8,10 @@ using UnityEngine;
 public class ServerManager : MonoBehaviour
 {
     UnityTransport transport;
+    GameManager gameManager;
     void Start()
     {
+        gameManager = FindObjectOfType<GameManager>();
         string[] args = System.Environment.GetCommandLineArgs();
 
         for (int i = 0; i < args.Length; i++)
@@ -24,20 +27,8 @@ public class ServerManager : MonoBehaviour
                 Debug.Log("======================= MODO SERVIDOR INICIADO ========================");
                 Debug.Log("======================= MODO SERVIDOR INICIADO ========================");
 
-                transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
-                if (transport != null)
-                {
-                    transport.MaxSendQueueSize = 8192;
-                    // ajustar timeouts
-                    //NetworkManager.Singleton.NetworkConfig.timeout ¿? ¿? = 10000;
-                    NetworkManager.Singleton.NetworkConfig.TickRate = 30;
-
-                    NetworkManager.Singleton.StartServer();
-
-                    NetworkManager.Singleton.OnClientConnectedCallback += MensajeConexionCliente;
-
-                    StartCoroutine(PingearClientes());            
-                }
+                gameManager.StartServer();
+                NetworkManager.Singleton.OnClientConnectedCallback += MensajeConexionCliente;
             }
         }
 

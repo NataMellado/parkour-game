@@ -19,10 +19,10 @@ public class NetworkTeamSync : NetworkBehaviour
         if (!IsServer)
         {
             ActualizarUIJugador(Team.SinEquipo);
+            playerTeam.OnValueChanged += OnTeamChanged;
+            OnTeamChanged(defaultTeam, playerTeam.Value);
         }
 
-        playerTeam.OnValueChanged += OnTeamChanged;
-        OnTeamChanged(defaultTeam, playerTeam.Value);
         //AsignarTeam();
         //Debug.Log("El jugador " + OwnerClientId + " se unió al equipo " + playerTeam.Value);
     }

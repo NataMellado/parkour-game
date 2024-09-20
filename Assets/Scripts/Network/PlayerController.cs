@@ -45,7 +45,7 @@ public class PlayerPresentation : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        Debug.Log("NetworkSpawn");
+        Debug.Log("NetworkSpawn PlayerController(Presentation)");
 
         if(networkObject == null){
             networkObject = GetComponent<NetworkObject>();

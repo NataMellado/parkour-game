@@ -29,6 +29,8 @@ namespace Tbvl.GameManager
             }
         }
 
+        UnityTransport transport;
+
         MainHNSGameLogic mainHNSGameLogic;
 
         private bool isConnected = false;
@@ -95,6 +97,23 @@ namespace Tbvl.GameManager
                 Debug.LogError($"Ocurrió un error en StartClient de GameManager!: {ex}");
             } 
 
+        }
+
+        public void StartServer()
+        {
+            transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
+            if (transport != null)
+            {
+                transport.MaxSendQueueSize = 8192;
+                // ajustar timeouts
+                //NetworkManager.Singleton.NetworkConfig.timeout ¿? ¿? = 10000;
+                NetworkManager.Singleton.NetworkConfig.TickRate = 60;
+
+                NetworkManager.Singleton.StartServer();
+
+
+                //StartCoroutine(PingearClientes());            
+            }
         }
 
         public bool ValidateServerAddress(string ip)
