@@ -43,8 +43,9 @@ public class ParkourController : MonoBehaviour
     IEnumerator DoParkourAction(ParkourAction action)
     {
         inAction = true;
+        playerController.isAnimating = true;
 
-        playerController.enabled = false;
+        //playerController.enabled = false;
         animator.applyRootMotion = true;
         playerController.Grounded = false;
         animator.SetBool("Grounded", false);
@@ -87,7 +88,8 @@ public class ParkourController : MonoBehaviour
         playerController.SetJumping(false);
         // Restaurar la rotación del player a la original 
         animator.applyRootMotion = false;
-        playerController.enabled = true;
+        playerController.isAnimating = false;
+        //playerController.enabled = true;
         playerController.Grounded = true;
         animator.SetBool("Grounded", true);
         inAction = false;

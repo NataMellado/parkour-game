@@ -20,6 +20,9 @@ namespace StarterAssets
         [Tooltip("Move speed of the character in m/s")]
         public float MoveSpeed = 2.0f;
 
+        [Tooltip("Si el jugador se está animando")]
+        public bool isAnimating;
+
         [Tooltip("Sprint speed of the character in m/s")]
         public float SprintSpeed = 5.335f;
 
@@ -152,6 +155,8 @@ namespace StarterAssets
             // reset our timeouts on start
             _jumpTimeoutDelta = JumpTimeout;
             _fallTimeoutDelta = FallTimeout;
+
+            isAnimating = false;
         }
 
         public override void OnNetworkSpawn(){
@@ -170,7 +175,8 @@ namespace StarterAssets
 
         private void Update()
         {
-            if (IsOwner){
+            if (IsOwner && !isAnimating)
+            {
 
                 _hasAnimator = TryGetComponent(out _animator);
 
