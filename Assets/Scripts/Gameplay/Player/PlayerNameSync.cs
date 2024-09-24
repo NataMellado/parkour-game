@@ -14,15 +14,23 @@ public class PlayerNameSync : NetworkBehaviour
             readPerm: NetworkVariableReadPermission.Everyone,
             writePerm: NetworkVariableWritePermission.Owner);
 
+    private UIManager uiManager;
+    private string playerName;
+
     [SerializeField]
     public TextMeshPro nombreJugadorText;
+
+    private void Awake()
+    {
+        uiManager = FindObjectOfType<UIManager>();
+    }
 
     private void Start()
     {
         if (IsOwner)
         {
             Debug.Log("Asignando nombre de jugador");
-            string playerName = ObtenerNombreJugador() ?? string.Empty;
+            string playerName = ObtenerNombreJugador();
             if (networkPlayerName.Value.Value != playerName)
                 networkPlayerName.Value = playerName;
         }
@@ -59,7 +67,15 @@ public class PlayerNameSync : NetworkBehaviour
     {
         // Implementa la lógica para obtener el nombre del jugador
         // Por ejemplo:
-        return "Jugador " + OwnerClientId;
+        playerName = uiManager.GetPlayerName();
+        Debug.Log("nombre jugador ingresado: " + playerName);
+        if (playerName == string.Empty || playerName.ToString().Trim().Equals(""))
+        {
+            return "Jugador " + OwnerClientId;
+        }else
+        {
+            return playerName;
+        }
     }
 
 }
