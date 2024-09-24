@@ -8,6 +8,7 @@ using System;
 
 namespace Tbvl.GameManager
 {
+
     public class GameManager : MonoBehaviour
     {
 
@@ -26,12 +27,16 @@ namespace Tbvl.GameManager
             }
         }
 
+
         private bool isConnected = false;
 
         public event System.Action<bool> OnConnectionStateChanged;
 
+        public GameObject[] playerPrefabs;
+
         public void Start()
         {
+
             NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected;
             NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnected;
 
@@ -51,8 +56,38 @@ namespace Tbvl.GameManager
         private void HandleClientConnected(ulong clientId)
         {
             if (clientId == NetworkManager.Singleton.LocalClientId)
+            {
                 IsConnected = true;
+                CharacterSelection.Instance.SelectSkin();
+                //SubmitCharacterSelectionServerRpc(CharacterSelection.Instance.GetSelectedCharacterIndex());
+                StartCoroutine(CallSpawnPlayer());
+            }
         }
+
+        private IEnumerator CallSpawnPlayer()
+        {
+            while (PlayerSpawner.Instance == null)
+            {
+                yield return null;
+            }
+            int selectedIndex = CharacterSelection.Instance.GetSelectedCharacterIndex();
+            PlayerSpawner.Instance.SubmitCharacterSelectionServerRpc(selectedIndex);
+        }
+
+        //[ServerRpc]
+        //private void SubmitCharacterSelectionServerRpc(int selectedIndex, ServerRpcParams rpcParams = default)
+        //{
+        //    ulong clientId = rpcParams.Receive.SenderClientId;
+        //    GameObject playerPrefab = GetPlayerPrefab(selectedIndex);
+        //    GameObject playerInstance = Instantiate(playerPrefab);
+        //    playerInstance.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId);
+        //}
+
+        private GameObject GetPlayerPrefab(int index)
+        {
+            return playerPrefabs[index];
+        }
+
         private void HandleClientDisconnected(ulong clientId)
         {
             if (clientId == NetworkManager.Singleton.LocalClientId)
@@ -66,6 +101,8 @@ namespace Tbvl.GameManager
 
         public void StartClient()
         {
+
+            //NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(SelectedCharacterIndex.ToString());
 
             // Obtener texto desde el objeto serverIpText (InputField)
             string serverIp = (serverIpText.text == "" || 

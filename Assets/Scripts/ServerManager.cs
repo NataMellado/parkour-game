@@ -3,8 +3,22 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public class ServerManager : MonoBehaviour
+public class ServerManager : NetworkBehaviour
 {
+    [SerializeField] TeamsManager teamsManager;
+    public static ServerManager Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+        }else
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+    }
     void Start()
     {
         string[] args = System.Environment.GetCommandLineArgs();
@@ -26,7 +40,9 @@ public class ServerManager : MonoBehaviour
 
                 NetworkManager.Singleton.OnClientConnectedCallback += MensajeConexionCliente;
 
-                StartCoroutine(PingearClientes());            
+                StartCoroutine(PingearClientes());    
+
+                teamsManager = FindObjectOfType<TeamsManager>();
             }
         } 
     }
@@ -34,28 +50,34 @@ public class ServerManager : MonoBehaviour
     public void MensajeConexionCliente(ulong idConexion)
     {
         Debug.Log(idConexion + " se ha conectado");
-        Debug.Log(idConexion + " se ha conectado");
-        Debug.Log(idConexion + " se ha conectado");
-        Debug.Log(idConexion + " se ha conectado");
     }
     public IEnumerator PingearClientes()
     {
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(10f);
 
         while (NetworkManager.Singleton.IsServer)
         {
-            yield return new WaitForSeconds(5f);
+            yield return new WaitForSeconds(10f);
             Debug.Log("Enviando ping....");
             PingClientRpc();
+            Debug.Log("Alterando equipos!");
+            AlternarEquipos();
         }
-    }
+    }   
 
     [ClientRpc]
     public void PingClientRpc()
     {
-        Debug.Log("Ping recibido desde el servidor!");
-        Debug.Log("Ping recibido desde el servidor!");
-        Debug.Log("Ping recibido desde el servidor!");
+        Debug.Log($"[Cliente {NetworkManager.Singleton.LocalClientId}] Ping recibido desde el servidor!");
     }
 
+    public void AlternarEquipos()
+    {
+        // Usar SwitchTeam() en cada jugador para cambiar su equipo
+
+        foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
+        {
+            teamsManager.SwitchTeam(client.ClientId);
+        }
+    }
 }

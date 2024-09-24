@@ -40,6 +40,7 @@ public class UIManager : MonoBehaviour
 
     private bool isConnected = false;
 
+    private bool gameFocused = true;
 
 
     private void Awake() {
@@ -71,7 +72,8 @@ public class UIManager : MonoBehaviour
             if (isConnected)
             {
                 var jugadorLocal = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
-                playerInput = jugadorLocal.GetComponent<PlayerInput>();
+                if (jugadorLocal != null)
+                    playerInput = jugadorLocal.GetComponent<PlayerInput>();
             }
             // Jugador conectado
             togglePauseMenu();
@@ -85,6 +87,8 @@ public class UIManager : MonoBehaviour
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
             SwitchToMenuCamera();
+            gameCamera.gameObject.SetActive(true);
+            gameCamera.GetComponent<AudioListener>().enabled = false;
         }
     }
 
@@ -127,7 +131,7 @@ public class UIManager : MonoBehaviour
     }
     private void OnDisconnectClicked()
     {
-        // Si está jugando, que no haga nada
+        // Si no está jugando, que no haga nada
         if (!isConnected)
             return;
 
@@ -148,6 +152,9 @@ public class UIManager : MonoBehaviour
         Debug.Log("Switching to game camera");
         // Cambiar cámaras
         gameCamera.gameObject.SetActive(true);
+        gameCamera.GetComponent<AudioListener>().enabled = true;
+
+        menuCamera.GetComponent<AudioListener>().enabled = false;
         menuCamera.gameObject.SetActive(false);
         HideUICanvas();
     }
@@ -158,6 +165,8 @@ public class UIManager : MonoBehaviour
         menuCamera.gameObject.SetActive(true);
         // Habilitar audio listener de la cámara
         menuCamera.GetComponent<AudioListener>().enabled = true;
+
+        gameCamera.GetComponent<AudioListener>().enabled = false;
         gameCamera.gameObject.SetActive(false);
         ShowUICanvas();
     }
@@ -170,14 +179,16 @@ public class UIManager : MonoBehaviour
             SwitchToMenuCamera();
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
-            playerInput.enabled = false;
+            if (playerInput != null)
+                playerInput.enabled = false;
         }
         else
         {
             SwitchToGameCamera();
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
-            playerInput.enabled = true;
+            if (playerInput != null)
+                playerInput.enabled = true;
         }
     }
 
@@ -191,6 +202,32 @@ public class UIManager : MonoBehaviour
             togglePauseMenu();
         }
     }
-    
+
+    private void OnApplicationFocus(bool focus)
+    {
+        if (focus)
+        {
+            //Debug.Log("Application focused");
+            gameFocused = true;
+        }else
+        {
+            gameFocused = false;
+        }
+
+        if (pauseMenu && gameFocused)
+        {
+            //Debug.Log("Cursor visible");
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else
+        {
+            //Debug.Log("Cursor locked");
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+
+    }
+
 }
 

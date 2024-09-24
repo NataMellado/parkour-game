@@ -28,7 +28,9 @@ public class PlayerPresentation : NetworkBehaviour
             //GetComponentInChildren<AudioListener>().enabled = true;
             GetComponent<ThirdPersonController>().enabled = true;
             GetComponent<CharacterController>().enabled = true;
-            GetComponent<ClientNetworkTransform>().enabled = true;
+            GetComponent<ClientNetworkAnimator>().enabled = true;
+            GetComponent<ParkourController>().enabled = true;
+            GetComponent<Animator>().enabled = true;
             foreach (GameObject g in remoteOnly){
                 g.SetActive(false);
             }
@@ -39,7 +41,7 @@ public class PlayerPresentation : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        Debug.Log("NetworkSpawn");
+        Debug.Log("NetworkSpawn playerController");
 
         if(networkObject == null){
             networkObject = GetComponent<NetworkObject>();

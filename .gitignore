@@ -75,5 +75,6 @@ crashlytics-build.properties
 
 _ServerBuilds/
 Builds/
+_Builds/
 ExtraFiles/
 ex_scripts/

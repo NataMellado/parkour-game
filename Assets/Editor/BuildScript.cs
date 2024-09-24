@@ -7,15 +7,29 @@ using UnityEditor.Build.Reporting;
 using UnityEditor.Build.Player;
 public class BuildScript
 {
+    static string buildPlayerPath = "_Builds/latest";
+    static string buildServerPath = "_ServerBuilds/latest";
+
     [MenuItem("Herramientas/Compilar Todo")]
     public static void BuildAll()
     {
-        BuildLinuxServer();
-        BuildWindowsClient();
+        BuildLinuxServer(buildServerPath);
+        BuildWindowsClient(buildPlayerPath);
     }
 
-    public static void BuildWindowsClient()
+
+public static void BuildWindowsClient(string buildPath)
     {
+        if (Directory.Exists(buildPath))
+        {
+            Directory.Delete(buildPath, true);
+        }
+
+        if (!Directory.Exists(buildPath))
+        {
+            Directory.CreateDirectory(buildPath);
+        }
+
         // Guardar los símbolos de compilación actuales
         string currentDefines = PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone);
 
@@ -25,7 +39,7 @@ public class BuildScript
         // Configurar opciones de compilación para el cliente de Windows
         BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
         buildPlayerOptions.scenes = GetScenePaths();
-        buildPlayerOptions.locationPathName = "Builds/latest/ParkourGame.exe";
+        buildPlayerOptions.locationPathName = buildPath+"/ParkourGame.exe";
         buildPlayerOptions.target = BuildTarget.StandaloneWindows64;
         buildPlayerOptions.options = BuildOptions.None;
 
@@ -36,8 +50,17 @@ public class BuildScript
         PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone, currentDefines);
     }
 
-    public static void BuildLinuxServer()
+    public static void BuildLinuxServer(string buildPath)
     {
+        if (Directory.Exists(buildPath))
+        {
+            Directory.Delete(buildPath, true);
+        }
+
+        if (!Directory.Exists(buildPath))
+        {
+            Directory.CreateDirectory(buildPath);
+        }
         // Guardar las configuraciones actuales
         var currentTarget = EditorUserBuildSettings.activeBuildTarget;
         var currentGroup = BuildPipeline.GetBuildTargetGroup(currentTarget);
@@ -53,10 +76,12 @@ public class BuildScript
         // Configurar opciones de compilación para el servidor de Linux
         BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
         buildPlayerOptions.scenes = GetScenePaths();
-        buildPlayerOptions.locationPathName = "_ServerBuilds/serverBuildLatest/serverBuild.x86_64";
+        buildPlayerOptions.locationPathName = buildPath+"/serverBuild.x86_64";
         buildPlayerOptions.target = BuildTarget.StandaloneLinux64;
         buildPlayerOptions.subtarget = (int)StandaloneBuildSubtarget.Server; // Especificar que es un servidor
         buildPlayerOptions.options = BuildOptions.None; // No es necesario usar BuildOptions.EnableHeadlessMode
+        // Agregar -batchmode y -nographics en la ejecución del servidor
+
 
         // Compilar el servidor de Linux
         BuildPipeline.BuildPlayer(buildPlayerOptions);

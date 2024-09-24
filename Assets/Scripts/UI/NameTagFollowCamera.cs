@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class NameTagFollowCamera : MonoBehaviour
@@ -19,7 +17,6 @@ public class NameTagFollowCamera : MonoBehaviour
             mainCamera = Camera.main;
             if (mainCamera == null)
             {
-                Debug.LogWarning("No se encontró la cámara principal");
                 return;
             }
         }
