@@ -27,7 +27,9 @@ public class UIManager : MonoBehaviour
 
     [SerializeField]
     private Canvas mainMenuCanvas;
-    
+
+    public TMP_InputField playerNameInputField;
+
     private GameManager gameManager;
 
     public bool pauseMenu = true;
@@ -227,6 +229,11 @@ public class UIManager : MonoBehaviour
             Cursor.visible = false;
         }
 
+    }
+
+    public string GetPlayerName()
+    {
+        return playerNameInputField.text;
     }
 
 }
