@@ -5,6 +5,7 @@ using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using TMPro;
 using System;
+using Unity.VisualScripting;
 
 namespace Tbvl.GameManager
 {
@@ -27,6 +28,9 @@ namespace Tbvl.GameManager
             }
         }
 
+        public float connectionTimeout = 4f;
+
+        public bool isConnecting = false;
 
         private bool isConnected = false;
 
@@ -58,6 +62,7 @@ namespace Tbvl.GameManager
             if (clientId == NetworkManager.Singleton.LocalClientId)
             {
                 IsConnected = true;
+                isConnecting = false;
                 CharacterSelection.Instance.SelectSkin();
                 //SubmitCharacterSelectionServerRpc(CharacterSelection.Instance.GetSelectedCharacterIndex());
                 StartCoroutine(CallSpawnPlayer());
@@ -92,16 +97,23 @@ namespace Tbvl.GameManager
         {
             if (clientId == NetworkManager.Singleton.LocalClientId)
                 IsConnected = false;
+            isConnecting = false;
         }
 
         public void StartHost(){
+            if (isConnected || isConnecting)
+                return;
+            isConnecting = true;
             NetworkManager.Singleton.StartHost();
             StartCoroutine(WaitForConnection());
         }
 
         public void StartClient()
         {
+            if (isConnected || isConnecting)
+                return;
 
+            isConnecting = true;
             //NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(SelectedCharacterIndex.ToString());
 
             // Obtener texto desde el objeto serverIpText (InputField)
@@ -146,7 +158,6 @@ namespace Tbvl.GameManager
                 }
             }
 
-
             return valid;
         }
 
@@ -155,12 +166,30 @@ namespace Tbvl.GameManager
             if (!IsConnected)
                 return;
             NetworkManager.Singleton.Shutdown();
+            isConnecting = false;
         }
 
         private IEnumerator WaitForConnection()
         {
-            // Espera hasta que el cliente esté conectado
-            yield return new WaitUntil(() => IsConnected);
+            // Espera hasta que el cliente esté conectado o como máximo 4 segundos:
+            float elapsedTime = 0f;
+            while (!IsConnected && elapsedTime < connectionTimeout)
+            {
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
+
+            // Validar que haya conectado a un servidor
+            if (!IsConnected)
+            {
+                Debug.LogWarning("No se pudo conectar al servidor");
+                NetworkManager.Singleton.Shutdown();
+                isConnecting = false;
+                yield break;
+            }
+            
+            // Si se conectó, se establece la conexión
+
 
             Debug.Log("Conectado al servidor");
             IsConnected = true;

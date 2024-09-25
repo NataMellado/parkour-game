@@ -27,7 +27,14 @@ public class CharacterSelection : MonoBehaviour
     private int SelectedCharacterIndex = 0;
     public void SelectSkin()
     {
-        SelectedCharacterIndex = int.Parse(skinIndex.text);
+        if (skinIndex.text.ToString().Trim() != "")
+            try
+            {
+                SelectedCharacterIndex = int.Parse(skinIndex.text);
+            }catch (System.Exception e)
+            {
+                Debug.LogError("Error al asignar Skin!: " + e.Message);
+            }
     }
     public int GetSelectedCharacterIndex()
     {

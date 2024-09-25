@@ -14,11 +14,11 @@ TagManager:
   - ParkourObstacle
   - Water
   - UI
+  - Player
   - 
-  - 
-  - 
-  - 
-  - 
+  - TeammateNames
+  - OwnName
+  - EnemyNames
   - 
   - 
   - 

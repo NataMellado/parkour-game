@@ -1,5 +1,7 @@
-//Error antiguo: Couldn't add payload of size 40 to reliable send queue. Closing connection 3 as reliability guarantees can't be maintained
-//X TODO: ARREGLAR RE-CONEXIÓN DE CLIENTE/HOST ANTES DE INGRESAR A UN SERVIDOR
+//XX  Error antiguo: Couldn't add payload of size 40 to reliable send queue. Closing connection 3 as reliability guarantees can't be maintained
+//XX  TODO: ARREGLAR RE-CONEXIÓN DE CLIENTE/HOST ANTES DE INGRESAR A UN SERVIDOR
 // ¿?: AGREGAR MINI MAPA DE JUGADORES
 // TODO: ARREGLAR ANIMACIÓN DE CAÍDA: CUANDO EL JUGADOR ATERRIZA ANTES DEL TIEMPO DE TÉRMINO DE ANIMACIÓN DE EN EL AIRE, LA ANIMACIÓN CONTINÚA (VARIAR LA ANIMACIÓN SEGÚN isGrounded)
-//X TODO: AL INGRESAR UN JUGADOR HABIENDO ASIGNADO LOS EQUIPOS, TODOS LOS EQUIPOS SE REINICIAN
+//XX  TODO: AL INGRESAR UN JUGADOR HABIENDO ASIGNADO LOS EQUIPOS, TODOS LOS EQUIPOS SE REINICIAN
+
+// TODO: Agregar LoadingState mientras se conecta a una partida...

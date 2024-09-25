@@ -41,6 +41,7 @@ public class UIManager : MonoBehaviour
     private PlayerInput playerInput;
 
     private bool isConnected = false;
+    private bool isConnecting;
 
     private bool gameFocused = true;
 
@@ -51,7 +52,7 @@ public class UIManager : MonoBehaviour
         connectButton.onClick.AddListener(OnConnectClicked);
         disconnectButton.onClick.AddListener(OnDisconnectClicked);
         gameManager = FindObjectOfType<GameManager>();
-
+        isConnecting = gameManager.isConnecting;
 
         // Suscribir a cambios en la conexión
         gameManager.OnConnectionStateChanged += HandleConnectionStateChanged;
@@ -101,7 +102,7 @@ public class UIManager : MonoBehaviour
         // Si está jugando, que no haga nada
         if (isConnected)
             return;
-        Debug.Log("Host clicked");
+        //Debug.Log("Host clicked");
         gameManager.StartHost();
     }
 
@@ -110,25 +111,24 @@ public class UIManager : MonoBehaviour
         // Si está jugando, que no haga nada
         if (isConnected)
             return;
-        Debug.Log("Client clicked");
+        //Debug.Log("Client clicked");
         gameManager.StartClient();
     }
 
     private void OnConnectClicked()
     {
-        // Si está jugando, que no haga nada
-        if (isConnected)
+        if (isConnecting)
             return;
-
         Debug.Log("Connect clicked");
 
         // Check if server ip input field is empty
-        if (gameManager.serverIpText.text.Trim() == "")
+        if (gameManager.serverIpText.text.ToString().Trim() == "" ||
+            gameManager.serverIpText.text.ToString().Trim() == string.Empty)
         {
-            Debug.LogError("Server IP is empty");
+            Debug.LogWarning("Server IP is empty");
             return;
         }
-
+        // TODO: Validate server IP
         gameManager.StartClient();
     }
     private void OnDisconnectClicked()
