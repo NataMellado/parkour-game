@@ -1506,6 +1506,7 @@ GameObject:
   - component: {fileID: 3131148493983891934}
   - component: {fileID: 1571629057180137604}
   - component: {fileID: 7407909325332748209}
+  - component: {fileID: 3844568666108763035}
   m_Layer: 6
   m_Name: JugadorPrefab
   m_TagString: Player
@@ -1545,7 +1546,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3853544205
+  GlobalObjectIdHash: 1062115077
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -2053,6 +2054,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TransitionStateInfoList: []
   m_Animator: {fileID: 7723535089753975372}
+--- !u!114 &3844568666108763035
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4802217115245809297}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e2a223fe1104ce4ebe66eb9a48ee140, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4986924868958043927
 GameObject:
   m_ObjectHideFlags: 0

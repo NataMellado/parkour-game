@@ -42,20 +42,20 @@ public class NameLayerAssigner : NetworkBehaviour
                     {
                         Debug.Log("asignado owner");
                         // Nombre del propio jugador
-                        //SetLayer(playerTeamText, LayerMask.NameToLayer("OwnName"));
-                        //SetLayer(playerNameText, LayerMask.NameToLayer("OwnName"));
+                        SetLayer(playerTeamText, LayerMask.NameToLayer("OwnName"));
+                        SetLayer(playerNameText, LayerMask.NameToLayer("OwnName"));
                     }
                     else if (playerTeam == localTeam)
                     {
                         // Compañero de equipo
-                        //SetLayer(playerTeamText, LayerMask.NameToLayer("TeammateNames"));
-                        //SetLayer(playerNameText, LayerMask.NameToLayer("TeammateNames"));
+                        SetLayer(playerTeamText, LayerMask.NameToLayer("TeammateNames"));
+                        SetLayer(playerNameText, LayerMask.NameToLayer("TeammateNames"));
                     }
                     else
                     {
                         // Jugador del equipo contrario
-                        //SetLayer(playerTeamText, LayerMask.NameToLayer("EnemyNames"));
-                        //SetLayer(playerNameText, LayerMask.NameToLayer("EnemyNames"));
+                        SetLayer(playerTeamText, LayerMask.NameToLayer("EnemyNames"));
+                        SetLayer(playerNameText, LayerMask.NameToLayer("EnemyNames"));
                     }
                 }
             }
