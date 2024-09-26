@@ -77,4 +77,6 @@ _ServerBuilds/
 Builds/
 _Builds/
 ExtraFiles/
+*.drawio*
 ex_scripts/
+*.ai 
