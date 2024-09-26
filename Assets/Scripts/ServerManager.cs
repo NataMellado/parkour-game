@@ -8,6 +8,8 @@ public class ServerManager : NetworkBehaviour
     [SerializeField] TeamsManager teamsManager;
     public static ServerManager Instance { get; private set; }
 
+    public List<ulong> connectedPlayers; 
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -18,7 +20,43 @@ public class ServerManager : NetworkBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
+
+        // Initialize the list of connected players
+        connectedPlayers = new List<ulong>();
+        
+        // Subscribe to the events of player connection and disconnection
+        NetworkManager.Singleton.OnClientConnectedCallback += OnPlayerConnected;
+        NetworkManager.Singleton.OnClientDisconnectCallback += OnPlayerDisconnected;
+
     }
+
+    private void OnPlayerConnected(ulong clientId)
+    {
+        //Debug.Log("Player connected: " + clientId);
+        // Add to connectedPlayers the connected player clientId
+        connectedPlayers.Add(clientId);
+    }
+
+    private bool IsPlayerConnected(ulong clientId)
+    {
+        return connectedPlayers.Contains(clientId);
+        
+    }
+
+    private void OnPlayerDisconnected(ulong clientId)
+    {
+
+        //Debug.Log("Player disconnected: " + clientId);
+        // Remove from connectedPlayers the disconnected player clientId
+        try
+        {
+            connectedPlayers.Remove(clientId);
+        }catch(System.Exception e)
+        {
+            Debug.LogError("Error al desconectar jugador: " + e.Message);
+        }
+    }
+
     void Start()
     {
         string[] args = System.Environment.GetCommandLineArgs();
@@ -42,7 +80,6 @@ public class ServerManager : NetworkBehaviour
 
                 StartCoroutine(PingearClientes());    
 
-                teamsManager = FindObjectOfType<TeamsManager>();
             }
         } 
     }
