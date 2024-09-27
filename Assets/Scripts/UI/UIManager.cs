@@ -1,14 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 using Tbvl.GameManager;
-using UnityEngine.Rendering;
-using Unity.Netcode.Transports.UTP;
 using TMPro;
 using UnityEngine.InputSystem;
-using StarterAssets;
+using System.Collections;
 
 public class UIManager : MonoBehaviour
 {
@@ -45,6 +41,7 @@ public class UIManager : MonoBehaviour
 
     private bool gameFocused = true;
 
+    private NetworkObject jugadorLocal;
 
     private void Awake() {
         hostButton.onClick.AddListener(OnHostClicked);
@@ -69,14 +66,21 @@ public class UIManager : MonoBehaviour
     // Callback para cuando cambia el estado de la conexión
     private void HandleConnectionStateChanged(bool Connected)
     {
+        // TODO: Arreglar lógica de handling
         if (Connected)
         {
+            Debug.LogWarning("Jugador conectado");
             isConnected = true;
             if (isConnected)
             {
-                var jugadorLocal = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
-                if (jugadorLocal != null)
-                    playerInput = jugadorLocal.GetComponent<PlayerInput>();
+                // Logica para asignar playerInput de jugador
+                // OJO: SÓLO FUNCIONA CUANDO EL JUGADOR LOCAL ES SPAWNEADO POR EL NETWORKMANAGER
+                // COMO PREFAB DEFINIDO, NO FUNCIONA CUANDO EL SPAWNEO ES DE MANERA DINÁMICA
+                //jugadorLocal = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
+                //if (jugadorLocal != null)
+                //    playerInput = jugadorLocal.GetComponent<PlayerInput>();
+                //else
+                //    Debug.LogError("No se encontró el jugador local");
             }
             // Jugador conectado
             togglePauseMenu();
@@ -84,6 +88,7 @@ public class UIManager : MonoBehaviour
         }
         else
         {
+            Debug.LogWarning("Jugador desconectado");
             // Jugador desconectado
             isConnected = false;
             pauseMenu = true;
@@ -95,7 +100,29 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    
+    private void Start()
+    {
+
+        StartCoroutine(WaitForLocalPlayer());
+    }
+
+    private IEnumerator WaitForLocalPlayer()
+    {
+        while (NetworkManager.Singleton == null || NetworkManager.Singleton.IsClient)
+        {
+            yield return null;
+        }
+        while (NetworkManager.Singleton.LocalClient == null || NetworkManager.Singleton.LocalClient.PlayerObject == null)
+        {
+            yield return null;
+        }
+
+        // El objeto del jugador local está disponible
+        jugadorLocal = NetworkManager.Singleton.LocalClient.PlayerObject;
+        // Obtener el Player Input o cualquier componente
+        playerInput = jugadorLocal.GetComponent<PlayerInput>();
+        // Hacer lo que necesites con playerInput
+    }
 
     private void OnHostClicked()
     {

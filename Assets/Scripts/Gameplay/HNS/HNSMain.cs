@@ -9,7 +9,6 @@ using UnityEngine;
 public class HNSMain : MonoBehaviour
 {
     public static HNSMain instance;
-    int connectedPlayers = ServerManager.Instance.connectedPlayers.Count;
 
     //> Gamemode States
 
@@ -33,7 +32,7 @@ public class HNSMain : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(2f);
-            Debug.Log("Conn players: " + connectedPlayers);
+            //Debug.Log("Conn players: " + connectedPlayers);
         }
     }
 

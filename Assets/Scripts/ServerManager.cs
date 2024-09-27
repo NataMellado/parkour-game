@@ -8,6 +8,22 @@ public class ServerManager : NetworkBehaviour
 {
     [SerializeField] TeamsManager teamsManager;
 
+    public static ServerManager Instance { get; private set; }
+
+    private void Awake()
+    {
+        Debug.Log("Awake servidor");
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+        }else
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+    }
+
+
     public NetworkVariable<int> connectedPlayersCount = new NetworkVariable<int>();
 
     void Start()
@@ -29,13 +45,14 @@ public class ServerManager : NetworkBehaviour
 
                 NetworkManager.Singleton.StartServer();
 
-                NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
-                NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
 
                 StartCoroutine(PingearClientes());    
 
             }
-        } 
+        }
+
+    NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+    NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
     }
 
     public void OnClientConnected(ulong idConexion)
