@@ -23,7 +23,6 @@ public class NameLayerAssigner : NetworkBehaviour
 
     IEnumerator UpdateNameLayers()
     {
-        Debug.Log("UpdateNameLayers");
         while (true)
         {
             // Obtener todos los jugadores
@@ -40,7 +39,6 @@ public class NameLayerAssigner : NetworkBehaviour
                      //Asignar la capa adecuada al nombre
                     if (playerObject.OwnerClientId == OwnerClientId)
                     {
-                        Debug.Log("asignado owner");
                         // Nombre del propio jugador
                         SetLayer(playerTeamText, LayerMask.NameToLayer("OwnName"));
                         SetLayer(playerNameText, LayerMask.NameToLayer("OwnName"));

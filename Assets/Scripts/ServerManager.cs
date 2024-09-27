@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -6,56 +7,8 @@ using UnityEngine;
 public class ServerManager : NetworkBehaviour
 {
     [SerializeField] TeamsManager teamsManager;
-    public static ServerManager Instance { get; private set; }
 
-    public List<ulong> connectedPlayers; 
-
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-        }else
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-
-        // Initialize the list of connected players
-        connectedPlayers = new List<ulong>();
-        
-        // Subscribe to the events of player connection and disconnection
-        NetworkManager.Singleton.OnClientConnectedCallback += OnPlayerConnected;
-        NetworkManager.Singleton.OnClientDisconnectCallback += OnPlayerDisconnected;
-
-    }
-
-    private void OnPlayerConnected(ulong clientId)
-    {
-        //Debug.Log("Player connected: " + clientId);
-        // Add to connectedPlayers the connected player clientId
-        connectedPlayers.Add(clientId);
-    }
-
-    private bool IsPlayerConnected(ulong clientId)
-    {
-        return connectedPlayers.Contains(clientId);
-        
-    }
-
-    private void OnPlayerDisconnected(ulong clientId)
-    {
-
-        //Debug.Log("Player disconnected: " + clientId);
-        // Remove from connectedPlayers the disconnected player clientId
-        try
-        {
-            connectedPlayers.Remove(clientId);
-        }catch(System.Exception e)
-        {
-            Debug.LogError("Error al desconectar jugador: " + e.Message);
-        }
-    }
+    public NetworkVariable<int> connectedPlayersCount = new NetworkVariable<int>();
 
     void Start()
     {
@@ -76,7 +29,8 @@ public class ServerManager : NetworkBehaviour
 
                 NetworkManager.Singleton.StartServer();
 
-                NetworkManager.Singleton.OnClientConnectedCallback += MensajeConexionCliente;
+                NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+                NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
 
                 StartCoroutine(PingearClientes());    
 
@@ -84,9 +38,15 @@ public class ServerManager : NetworkBehaviour
         } 
     }
 
-    public void MensajeConexionCliente(ulong idConexion)
+    public void OnClientConnected(ulong idConexion)
     {
         Debug.Log(idConexion + " se ha conectado");
+        connectedPlayersCount.Value = NetworkManager.Singleton.ConnectedClients.Count;
+    }
+    public void OnClientDisconnected(ulong idConexion)
+    {
+        Debug.Log(idConexion + " se ha desconectado");
+        connectedPlayersCount.Value = NetworkManager.Singleton.ConnectedClients.Count;
     }
     public IEnumerator PingearClientes()
     {

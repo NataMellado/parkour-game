@@ -10,8 +10,6 @@ using UnityEngine;
 public class TeamsManager : NetworkBehaviour
 {
 
-    private List<ulong> connectedPlayers = ServerManager.Instance.connectedPlayers;
-
     /// <summary>
     /// Changes the player team.
     /// </summary>

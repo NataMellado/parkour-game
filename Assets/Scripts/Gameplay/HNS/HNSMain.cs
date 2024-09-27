@@ -9,13 +9,50 @@ using UnityEngine;
 public class HNSMain : MonoBehaviour
 {
     public static HNSMain instance;
-    // Any customization parameters for the game mode
+    int connectedPlayers = ServerManager.Instance.connectedPlayers.Count;
 
     //> Gamemode States
 
-    //> Gamemode Parameters
+    enum GameState
+    {
+        Starting,
+        Started,
+        Playing,
+        Ending,
+        Ended
+    }
+
+    private void Start()
+    {
+        StartCoroutine(CheckForConnectedPlayers());
+    }
+
+    public IEnumerator CheckForConnectedPlayers()
+    {
+        yield return new WaitForSeconds(2f);
+        while (true)
+        {
+            yield return new WaitForSeconds(2f);
+            Debug.Log("Conn players: " + connectedPlayers);
+        }
+    }
 
     //> Gamemode Stats
+    /// <summary>
+    /// 
+    /// </summary>
+    private void resetPlayerStats()
+    {
+
+    }
+
+    //> Gamemode Parameters
+    // Round time
+    // Max rounds per game
+    // Max players per team
+    // Max rounds without hiders winning
+    
+    // Any customization parameters for the game mode
 
     //> Gamemode Start
         
