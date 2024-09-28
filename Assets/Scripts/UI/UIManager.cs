@@ -8,7 +8,8 @@ using System.Collections;
 
 public class UIManager : MonoBehaviour
 {
-    
+    public static UIManager Instance { get; private set; }
+
     [SerializeField]
     private Button hostButton;
 
@@ -43,7 +44,18 @@ public class UIManager : MonoBehaviour
 
     private NetworkObject jugadorLocal;
 
-    private void Awake() {
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+
         hostButton.onClick.AddListener(OnHostClicked);
         clientButton.onClick.AddListener(OnClientClicked);
         connectButton.onClick.AddListener(OnConnectClicked);
@@ -206,16 +218,17 @@ public class UIManager : MonoBehaviour
         if (pauseMenu)
         {
             SwitchToMenuCamera();
-            Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
             if (playerInput != null)
                 playerInput.enabled = false;
+            ChangeTeamMenu.Instance.HideUICanvas();
         }
         else
         {
             SwitchToGameCamera();
-            Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
             if (playerInput != null)
                 playerInput.enabled = true;
         }
@@ -229,6 +242,12 @@ public class UIManager : MonoBehaviour
         {
             Debug.Log("Toggle pause menu");
             togglePauseMenu();
+        }
+
+        if (Input.GetMouseButton(0) && !pauseMenu && !ChangeTeamMenu.Instance.changeTeamMenuActive)
+        {
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
         }
     }
 

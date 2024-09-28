@@ -24,7 +24,10 @@ public class ServerManager : NetworkBehaviour
     }
 
 
-    public NetworkVariable<int> connectedPlayersCount = new NetworkVariable<int>();
+    public NetworkVariable<int> connectedPlayersCount = new NetworkVariable<int>(
+        0,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server);
 
     void Start()
     {
@@ -50,9 +53,12 @@ public class ServerManager : NetworkBehaviour
 
             }
         }
+        if (IsServer)
+        {
 
-    NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
-    NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
+            NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+            NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
+        }
     }
 
     public void OnClientConnected(ulong idConexion)
