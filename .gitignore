@@ -79,5 +79,4 @@ _Builds/
 ExtraFiles/
 *.drawio*
 ex_scripts/
-*.ai 
-Assets/SyntyStudios* 
+*.ai

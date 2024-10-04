@@ -4,10 +4,11 @@
 // TODO: ARREGLAR ANIMACIÓN DE CAÍDA: CUANDO EL JUGADOR ATERRIZA ANTES DEL TIEMPO DE TÉRMINO DE ANIMACIÓN DE EN EL AIRE, LA ANIMACIÓN CONTINÚA (VARIAR LA ANIMACIÓN SEGÚN isGrounded)
 //XX  TODO: AL INGRESAR UN JUGADOR HABIENDO ASIGNADO LOS EQUIPOS, TODOS LOS EQUIPOS SE REINICIAN
 
-// TODO: Agregar LoadingState mientras se conecta a una partida...
 
+// TODO: Agregar LoadingState mientras se conecta a una partida...**
+// TODO: Continuar con lógica de HNS Gamemode**
 
 // TODO: Implementar chat de voz y de mensajes
 // TODO: Finalizar menú de selección de personaje y cambio de equipo
-// TODO: Continuar con lógica de HNS Gamemode
+
 // TODO: Implementar lógica de selección de personaje y probar en servidor
