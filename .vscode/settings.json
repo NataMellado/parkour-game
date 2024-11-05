@@ -56,6 +56,6 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "ParkourGame.sln",
+    "dotnet.defaultSolution": "parkour-game.sln",
     "dotnet.preferCSharpExtension": true
 }
