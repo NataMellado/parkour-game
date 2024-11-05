@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -23,6 +24,7 @@ public class HNSMain : MonoBehaviour
 
     private void Start()
     {
+        Console.WriteLine("HNSMain started");
         StartCoroutine(CheckForConnectedPlayers());
     }
 
@@ -32,7 +34,19 @@ public class HNSMain : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(2f);
-            //Debug.Log("Conn players: " + connectedPlayers);
+            // Get connected player objects
+            Debug.Log("Imprimiendo connected players hnsmain...");
+            GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+            foreach (GameObject player in players)
+            {
+                PlayerNameSync playerNameSync = player.GetComponent<PlayerNameSync>();
+                PlayerTeamSync playerTeamSync = player.GetComponent<PlayerTeamSync>();
+                if (playerNameSync != null && playerTeamSync != null)
+                {
+                    Debug.Log("Player name: " + playerNameSync.networkPlayerName.Value);
+                    Debug.Log("Player team: " + playerTeamSync.networkPlayerTeam.Value);
+                }
+            }
         }
     }
 

@@ -34,8 +34,13 @@ public class PlayerSpawner : NetworkBehaviour
         }
 
         // Instanciar y spawnear el prefab seleccionado
+        GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("SpawnPoint");
+
+
         GameObject playerPrefab = playerPrefabs[selectedIndex];
-        GameObject playerInstance = Instantiate(playerPrefab);
+        GameObject playerInstance = Instantiate(playerPrefab,
+            spawnPoints[UnityEngine.Random.Range(0, spawnPoints.Length - 1)].transform.position,
+            Quaternion.identity);
         playerInstance.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId);
 
         Debug.Log($"Jugador spawneado para el cliente {clientId} con el prefab índice {selectedIndex}");

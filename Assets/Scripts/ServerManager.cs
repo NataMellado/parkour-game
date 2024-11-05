@@ -21,6 +21,9 @@ public class ServerManager : NetworkBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
+
+        StartCoroutine(CheckConnectedPlayers());
+
     }
 
 
@@ -58,6 +61,8 @@ public class ServerManager : NetworkBehaviour
 
             NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
             NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
+
+            Console.WriteLine("Server started");
         }
     }
 
@@ -83,7 +88,17 @@ public class ServerManager : NetworkBehaviour
             Debug.Log("Alterando equipos!");
             AlternarEquipos();
         }
-    }   
+    }
+    public IEnumerator CheckConnectedPlayers()
+    {
+        yield return new WaitForSeconds(10f);
+        
+        while (true) {
+            yield return new WaitForSeconds(10f);
+            // Get connected player objects
+            Debug.Log("Imprimiendo connected players servermanager...");
+        }
+    }
 
     [ClientRpc]
     public void PingClientRpc()
