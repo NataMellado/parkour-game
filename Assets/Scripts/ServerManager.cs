@@ -22,7 +22,7 @@ public class ServerManager : NetworkBehaviour
             DontDestroyOnLoad(gameObject);
         }
 
-        StartCoroutine(CheckConnectedPlayers());
+        //StartCoroutine(CheckConnectedPlayers());
 
     }
 
@@ -52,7 +52,8 @@ public class ServerManager : NetworkBehaviour
                 NetworkManager.Singleton.StartServer();
 
 
-                StartCoroutine(PingearClientes());    
+                StartCoroutine(PingearClientes());
+
 
             }
         }
@@ -62,8 +63,18 @@ public class ServerManager : NetworkBehaviour
             NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
             NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
 
-            Console.WriteLine("Server started");
+            Debug.Log("Server started");
+            HNSMain.Instance.StartHNSMain();
         }
+    }
+
+    public void ServerStartHost()
+    {
+        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+        NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
+
+        Debug.Log("Server started as HOST MODE");
+        HNSMain.Instance.StartHNSMain();
     }
 
     public void OnClientConnected(ulong idConexion)
@@ -86,19 +97,20 @@ public class ServerManager : NetworkBehaviour
             Debug.Log("Enviando ping....");
             PingClientRpc();
             Debug.Log("Alterando equipos!");
-            AlternarEquipos();
+            //AlternarEquipos();
         }
     }
-    public IEnumerator CheckConnectedPlayers()
-    {
-        yield return new WaitForSeconds(10f);
+    //si funciona
+    //public IEnumerator CheckConnectedPlayers()
+    //{
+    //    yield return new WaitForSeconds(10f);
         
-        while (true) {
-            yield return new WaitForSeconds(10f);
-            // Get connected player objects
-            Debug.Log("Imprimiendo connected players servermanager...");
-        }
-    }
+    //    while (true) {
+    //        yield return new WaitForSeconds(10f);
+    //        // Get connected player objects
+    //        Debug.Log("Imprimiendo connected players servermanager...");
+    //    }
+    //}
 
     [ClientRpc]
     public void PingClientRpc()

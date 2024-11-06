@@ -120,6 +120,8 @@ namespace Tbvl.GameManager
             isConnecting = true;
             NetworkManager.Singleton.StartHost();
             StartCoroutine(WaitForConnection());
+
+            ServerManager.Instance.ServerStartHost();
         }
 
         public void StartClient()

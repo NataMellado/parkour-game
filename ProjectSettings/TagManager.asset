@@ -7,6 +7,8 @@ TagManager:
   - CinemachineTarget
   - SpawnPoint
   - Fence
+  - PoliciasSpawnPoint
+  - LadronesSpawnPoint
   layers:
   - Default
   - TransparentFX

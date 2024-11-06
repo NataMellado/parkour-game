@@ -16,6 +16,7 @@ namespace StarterAssets
 #endif
     public class ThirdPersonController : NetworkBehaviour
     {
+        public bool isTeleporting = false;
         [Header("Player")]
         [Tooltip("Move speed of the character in m/s")]
         public float MoveSpeed = 2.0f;
@@ -180,9 +181,12 @@ namespace StarterAssets
 
                 _hasAnimator = TryGetComponent(out _animator);
 
-                JumpAndGravity();
-                GroundedCheck();
-                Move();
+                if (!isTeleporting)
+                {
+                    JumpAndGravity();
+                    GroundedCheck();
+                    Move();
+                }
             }
         }
 
@@ -293,8 +297,11 @@ namespace StarterAssets
             Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
 
             // move the player
-            _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
-                             new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+            if (!isTeleporting)
+            {
+                _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
+                 new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+            }
 
             // update animator if using character
             if (_hasAnimator)

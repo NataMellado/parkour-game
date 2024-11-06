@@ -25,6 +25,12 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private Canvas mainMenuCanvas;
 
+    [SerializeField]
+    private Canvas messageTextBoxCanvas;
+
+    [SerializeField]
+    private TextMeshProUGUI messageTextBox;
+
     public TMP_InputField playerNameInputField;
 
     private GameManager gameManager;
@@ -180,7 +186,8 @@ public class UIManager : MonoBehaviour
 
         gameManager.Disconnect();
     }
-    private void HideUICanvas(){
+    private void HideUICanvas()
+    {
         mainMenuCanvas.gameObject.SetActive(false);
     }
 
@@ -201,7 +208,7 @@ public class UIManager : MonoBehaviour
     }
 
     private void SwitchToMenuCamera()
-    { 
+    {
         Debug.Log("Switching to menu camera");
         menuCamera.gameObject.SetActive(true);
         // Habilitar audio listener de la cámara
@@ -234,7 +241,8 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    private void Update() {
+    private void Update()
+    {
 
 
         // Si presiona la tecla A, el cursor se muestra
@@ -257,7 +265,8 @@ public class UIManager : MonoBehaviour
         {
             //Debug.Log("Application focused");
             gameFocused = true;
-        }else
+        }
+        else
         {
             gameFocused = false;
         }
@@ -280,6 +289,21 @@ public class UIManager : MonoBehaviour
     public string GetPlayerName()
     {
         return playerNameInputField.text;
+    }
+
+    public void SetCanvasMessage(string message)
+    {
+        if (message != null || message != "")
+        {
+            messageTextBoxCanvas.gameObject.SetActive(true);
+            messageTextBox.text = message;
+        }
+    }
+
+    public void ResetCanvasMessage()
+    {
+        messageTextBox.text = "";
+        messageTextBoxCanvas.gameObject.SetActive(false);
     }
 
 }
