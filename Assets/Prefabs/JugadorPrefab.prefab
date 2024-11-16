@@ -2084,11 +2084,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26e54e5a728a9234ab24fcf1460ed8a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+<<<<<<< HEAD
   isTeleporting: 0
   isFrozen: 0
   MoveSpeed: 2
+=======
+  MoveSpeed: 5
+>>>>>>> e2976ac39f86eb8b709188451030cbbecff37138
   isAnimating: 0
-  SprintSpeed: 5.335
+  SprintSpeed: 10
   RotationSmoothTime: 0.08
   SpeedChangeRate: 10
   LandingAudioClip: {fileID: 8300000, guid: ff697d3070687ce4583faa0561a145a2, type: 3}

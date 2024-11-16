@@ -26,10 +26,10 @@ public class PlayerSpawner : NetworkBehaviour
     {
         ulong clientId = rpcParams.Receive.SenderClientId;
 
-        // Validar el Ìndice
+        // Validar el √≠ndice
         if (selectedIndex < 0 || selectedIndex >= playerPrefabs.Length)
         {
-            Debug.LogWarning($"Õndice de personaje inv·lido recibido del cliente {clientId}");
+            Debug.LogWarning($"√çndice de personaje inv√°lido recibido del cliente {clientId}");
             return;
         }
 
@@ -43,6 +43,6 @@ public class PlayerSpawner : NetworkBehaviour
             Quaternion.identity);
         playerInstance.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId);
 
-        Debug.Log($"Jugador spawneado para el cliente {clientId} con el prefab Ìndice {selectedIndex}");
+        Debug.Log($"Jugador spawneado para el cliente {clientId} con el prefab √≠ndice {selectedIndex}");
     }
 }
