@@ -1,6 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using StarterAssets;
+using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
@@ -12,15 +15,23 @@ public class PlayerPresentation : NetworkBehaviour
     public NetworkTransform networkTransform;
     public UIManager uiManager;
     public ThirdPersonController thirdPersonController;
-    private PlayerInput playerInput;
+    public StarterAssetsInputs starterAssetsInputs;
+
 
     [SerializeField]
     private List<GameObject> remoteOnly = new List<GameObject>();
+
+
+
+
 
     private void Awake()
     {
         uiManager = FindObjectOfType<UIManager>();
     }
+
+
+
 
     private bool prevIsOwner
     {
@@ -45,11 +56,6 @@ public class PlayerPresentation : NetworkBehaviour
             GetComponent<CharacterController>().enabled = true;
             GetComponent<ClientNetworkAnimator>().enabled = true;
             GetComponent<ParkourController>().enabled = true;
-            GetComponent<Animator>().enabled = true;
-            foreach (GameObject g in remoteOnly)
-            {
-                g.SetActive(false);
-            }
         }
     }
 
@@ -61,22 +67,34 @@ public class PlayerPresentation : NetworkBehaviour
 
         thirdPersonController = GetComponent<ThirdPersonController>();
         networkTransform = GetComponent<NetworkTransform>();
+        starterAssetsInputs = GetComponent<StarterAssetsInputs>();
         if (networkObject == null)
         {
             networkObject = GetComponent<NetworkObject>();
         }
+
     }
+
+
 
     private void Update()
     {
         prevIsOwner = IsOwner;
+        
+        //for (int i = 0; i < skinModels.Length; i++)
+        //{
+        //    Debug.Log(skinModels[i].name + " " + skinModels[i].activeSelf);
+        //}
     }
+
+    
 
     [ClientRpc]
     public void TeleportClientRpc(Vector3 newPosition, ClientRpcParams clientRpcParams = default)
     {
         if (IsOwner)
         {
+
             if (networkTransform != null)
             {
                 thirdPersonController.enabled = false;
@@ -88,8 +106,8 @@ public class PlayerPresentation : NetworkBehaviour
             {
                 transform.position = newPosition;
             }
-            StartCoroutine(ResetIsTeleporting());
         }
+        StartCoroutine(ResetIsTeleporting());
     }
 
     [ClientRpc]
@@ -97,9 +115,8 @@ public class PlayerPresentation : NetworkBehaviour
     {
         if (IsOwner)
         {
-            Debug.Log("Freezing player");
-            if (playerInput != null)
-                playerInput.enabled = false;
+            //thirdPersonController.FreezePlayer();
+            starterAssetsInputs.FreezePlayer();
         }
     }
 
@@ -108,16 +125,16 @@ public class PlayerPresentation : NetworkBehaviour
     {
         if (IsOwner)
         {
-            Debug.Log("Unfreezing player");
-            if (playerInput != null && !playerInput.enabled)
-                playerInput.enabled = true;
+            //thirdPersonController.UnfreezePlayer();
+            starterAssetsInputs.UnfreezePlayer();
         }
     }
 
     [ClientRpc]
     public void LogToClientRpc(string message, ClientRpcParams clientRpcParams = default)
     {
-        Debug.Log(message);
+        if (IsOwner)
+            Debug.Log(message);
     }
 
     private IEnumerator ResetIsTeleporting()
@@ -131,12 +148,14 @@ public class PlayerPresentation : NetworkBehaviour
     [ClientRpc]
     public void SetPlayerInGameMessageClientRpc(string message, ClientRpcParams clientRpcParams = default)
     {
-        uiManager.SetCanvasMessage(message);
+        if (IsOwner)
+            uiManager.SetCanvasMessage(message);
     }
 
     [ClientRpc]
     public void ResetPlayerInGameMessageClientRpc(ClientRpcParams clientRpcParams = default)
     {
-        uiManager.ResetCanvasMessage();
+        if (IsOwner)
+            uiManager.ResetCanvasMessage();
     }
 }

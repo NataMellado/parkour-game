@@ -110,7 +110,7 @@ public class HNSMain : NetworkBehaviour
             UpdateMinimumPlayersStatus();
 
             // Mensaje opcional mientras se espera
-            Debug.Log("Esperando a más jugadores...");
+            //Debug.Log("Esperando a más jugadores...");
         }
 
         // Cuando se alcanza el número mínimo, inicia el conteo regresivo
@@ -137,7 +137,7 @@ public class HNSMain : NetworkBehaviour
 
         while (segundosRestantes > 0)
         {
-            SetPlayersCanvasMessage("Tienes " + segundosRestantes + " segundos para esconderte!");
+            SetPlayersCanvasMessage("Los Ladrones tienen " + segundosRestantes + " segundos para esconderse!");
             yield return new WaitForSeconds(1f);
             segundosRestantes--;
         }
@@ -165,12 +165,42 @@ public class HNSMain : NetworkBehaviour
         // Teletranpsorta a los jugadores a sus puntos de spawn
         TeleportPlayersToSpawn();
         // Congela a los policias
+        FreezePoliceTeam();
         // Cuenta regresiva de 10 segundos
         yield return StartingGameCountdown();
         // Descongela a los policias
+        UnfreezePoliceTeam();
         // Comienza el juego
         Debug.Log("Partida iniciada!!! CORRAAAN (server)");
         LogToPlayers("Partida iniciada!!! CORRAAAN (players)");
+        SetPlayersTimedCanvasMessage("¡Policías a la caza de los ladrones!", 6f);
+    }
+
+    public void FreezePoliceTeam()
+    {
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        foreach (GameObject player in players)
+        {
+            PlayerPresentation playerController = player.GetComponent<PlayerPresentation>();
+            PlayerTeamSync playerTeam = player.GetComponent<PlayerTeamSync>();
+            if (playerController != null && playerTeam != null)
+            {
+                if (playerTeam.networkPlayerTeam.Value == PlayerTeamSync.Team.Policias)
+                    playerController.FreezePlayerClientRpc();
+            }
+        }
+    }
+    public void UnfreezePoliceTeam()
+    {
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        foreach (GameObject player in players)
+        {
+            PlayerPresentation playerController = player.GetComponent<PlayerPresentation>();
+            if (playerController != null)
+            {
+                playerController.UnfreezePlayerClientRpc();
+            }
+        }
     }
 
     public void LogToPlayers(string message)
@@ -197,6 +227,20 @@ public class HNSMain : NetworkBehaviour
                 playerController.SetPlayerInGameMessageClientRpc(message);
             }
         }
+    }
+    public IEnumerator SetPlayersTimedCanvasMessage(string message, float duration)
+    {
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        foreach (GameObject player in players)
+        {
+            PlayerPresentation playerController = player.GetComponent<PlayerPresentation>();
+            if (playerController != null)
+            {
+                playerController.SetPlayerInGameMessageClientRpc(message);
+                yield return new WaitForSeconds(duration);
+            }
+        }
+        ResetPlayersCanvasMessage();
     }
 
     public void ResetPlayersCanvasMessage()
@@ -227,6 +271,8 @@ public class HNSMain : NetworkBehaviour
     //> Function to set players per team
     private void SetPlayersPerTeam()
     {
+        policiasPlayers = 0;
+        ladronesPlayers = 0;
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         foreach (GameObject player in players)
         {
@@ -243,6 +289,7 @@ public class HNSMain : NetworkBehaviour
                 }
             }
         }
+
         if (policiasPlayers >= minimumPlayersPerTeamToStart && ladronesPlayers >= minimumPlayersPerTeamToStart)
         {
             minimumPlayersReached = true;

@@ -6,8 +6,6 @@ using UnityEngine;
 
 public class ServerManager : NetworkBehaviour
 {
-    [SerializeField] TeamsManager teamsManager;
-
     public static ServerManager Instance { get; private set; }
 
     private void Awake()
@@ -75,6 +73,7 @@ public class ServerManager : NetworkBehaviour
 
         Debug.Log("Server started as HOST MODE");
         HNSMain.Instance.StartHNSMain();
+        StartCoroutine(PingearClientes());
     }
 
     public void OnClientConnected(ulong idConexion)
@@ -89,15 +88,13 @@ public class ServerManager : NetworkBehaviour
     }
     public IEnumerator PingearClientes()
     {
-        yield return new WaitForSeconds(10f);
-
-        while (NetworkManager.Singleton.IsServer)
+        while (NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsHost)
         {
-            yield return new WaitForSeconds(10f);
-            Debug.Log("Enviando ping....");
-            PingClientRpc();
-            Debug.Log("Alterando equipos!");
-            //AlternarEquipos();
+            yield return new WaitForSeconds(20f);
+            //Debug.Log("Enviando ping....");
+            //PingClientRpc();
+            //Debug.Log("Alternando equipos!");
+            AlternarEquipos();
         }
     }
     //si funciona
@@ -124,7 +121,7 @@ public class ServerManager : NetworkBehaviour
 
         foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
         {
-            teamsManager.SwitchTeam(client.ClientId);
+            TeamsManager.Instance.SwitchTeam(client.ClientId);
         }
     }
 }

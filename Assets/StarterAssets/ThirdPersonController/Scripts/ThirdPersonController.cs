@@ -17,6 +17,8 @@ namespace StarterAssets
     public class ThirdPersonController : NetworkBehaviour
     {
         public bool isTeleporting = false;
+        public bool isFrozen = false;
+
         [Header("Player")]
         [Tooltip("Move speed of the character in m/s")]
         public float MoveSpeed = 2.0f;
@@ -238,6 +240,17 @@ namespace StarterAssets
             // Cinemachine will follow this target
             CinemachineCameraTarget.transform.rotation = Quaternion.Euler(_cinemachineTargetPitch + CameraAngleOverride,
                 _cinemachineTargetYaw, 0.0f);
+        }
+
+        public void FreezePlayer()
+        {
+            Debug.Log("Freezing player");
+            isFrozen = true;
+        }
+        public void UnfreezePlayer()
+        {
+            Debug.Log("Unfreezing player");
+            isFrozen = false;
         }
 
         private void Move()

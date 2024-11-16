@@ -59,12 +59,23 @@ public class PlayerTeamSync : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        if (IsServer)
-        {
-            AssignTeam();
-        }
         networkPlayerTeam.OnValueChanged += OnTeamChanged;
-        UpdateTeamUI(networkPlayerTeam.Value);
+        if (IsOwner)
+        {
+            Debug.Log("Asignando equipo");
+            AssignTeamServerRpc();
+            //StartCoroutine(CheckMyTeam());
+        }
+        /*
+        else
+        {
+            // Si no somos el propietario, podemos verificar si el equipo ya está asignado
+            if (networkPlayerTeam.Value != Team.SinEquipo)
+            {
+                OnTeamChanged(Team.SinEquipo, networkPlayerTeam.Value);
+            }
+        }*/
+        StartCoroutine(WaitAndInitializeUI());
     }
     private void OnDestroy()
     {
@@ -72,15 +83,68 @@ public class PlayerTeamSync : NetworkBehaviour
         networkPlayerTeam.OnValueChanged -= OnTeamChanged;
     }
 
-    private void AssignTeam()
+    private IEnumerator WaitAndInitializeUI()
     {
-        networkPlayerTeam.Value = GetAssignedTeam();
+        // Esperar un frame para asegurar que las NetworkVariables estén sincronizadas
+        yield return null;
+
+        if (networkPlayerTeam.Value != Team.SinEquipo)
+        {
+            UpdateTeamUI(networkPlayerTeam.Value);
+        }
+    }
+    private IEnumerator CheckMyTeam()
+    {
+        while (true) {
+            //Debug.LogWarning("CheckMyTeam: " + OwnerClientId + " -> " + networkPlayerTeam.Value);
+            yield return new WaitForSeconds(2);
+        };
     }
 
-    private Team GetAssignedTeam()
+    [ServerRpc(RequireOwnership = false)]
+    private void AssignTeamServerRpc(ServerRpcParams rpcParams = default)
+    {
+        try
+        {
+            ulong clientId = rpcParams.Receive.SenderClientId;
+
+            Team assignedTeam = GetAssignedTeam(clientId);
+            if (NetworkManager.Singleton.ConnectedClients.TryGetValue(clientId, out var client))
+            {
+                var playerObject = client.PlayerObject;
+                if (playerObject != null)
+                {
+                    var playerTeamSync = playerObject.GetComponent<PlayerTeamSync>();
+                    if (playerTeamSync != null)
+                    {
+                        playerTeamSync.networkPlayerTeam.Value = assignedTeam;
+                        Debug.Log($"[SERVER] (AssignTeamServerRpc) Team asignado a {clientId}: {assignedTeam.ToString()}");
+                    }
+                    else
+                    {
+                        Debug.LogError($"[SERVER] PlayerTeamSync no encontrado en el objeto del jugador para clientId: {clientId}");
+                    }
+                }
+                else
+                {
+                    Debug.LogError($"[SERVER] PlayerObject es null para clientId: {clientId}");
+                }
+            }
+            else
+            {
+                Debug.LogError($"[SERVER] ConnectedClients no contiene clientId: {clientId}");
+            }
+            //Debug.Log("[SERVER] Equipo asignado" + " a ID[" + clientId + "]: " + networkPlayerTeam.Value);
+        } catch (System.Exception e)
+        {
+            Debug.LogError($"[SERVER] Error en AssignTeamServerRpc(): {e.Message}");
+        }
+    }
+
+    private Team GetAssignedTeam(ulong clientId)
     {
         // Implementar la lógica para asignar un equipo al jugador
-        if (OwnerClientId % 2 == 0)
+        if (clientId % 2 == 0)
         {
             return Team.Policias;
         }

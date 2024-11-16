@@ -20,4 +20,14 @@ public class ServerTeamManager : NetworkBehaviour
         Debug.Log("Cambiando equipo del jugador: " + id + " al team: " + team);
         playerTeam.SwitchToTeam(teamPolicias);
     }
+
+    [ClientRpc]
+    public void SetTeamOnPlayerJoinClientRpc()
+    {
+        // Obtener id del jugador
+        ulong id = NetworkManager.Singleton.LocalClientId;
+        Debug.Log("Cambiando equipo del jugador: " + id + " al team: " + teamPolicias);
+        playerTeam.SwitchToTeam(teamPolicias);
+    }
+
 }
