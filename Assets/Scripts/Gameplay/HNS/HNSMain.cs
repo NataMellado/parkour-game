@@ -1,5 +1,3 @@
-using JetBrains.Annotations;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -15,6 +13,7 @@ public class HNSMain : NetworkBehaviour
 
     private GameState currentGameState = GameState.Stopped;
 
+    private List<PlayerTeamSync> playerTeamSyncs = new List<PlayerTeamSync>();
     private void Awake()
     {
         Debug.Log("Awake servidor HNSMain");
@@ -27,6 +26,13 @@ public class HNSMain : NetworkBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
+
+    }
+
+    private void Start()
+    {
+        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+        NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
     }
 
     public int roundTime = 300;
@@ -52,9 +58,74 @@ public class HNSMain : NetworkBehaviour
 
     public void StartHNSMain()
     {
-        Console.WriteLine("HNSMain started");
+        Debug.Log("[SERVER] HNSMain started");
         PreStartGame();
         //StartCoroutine(TeleportPlayers10Seconds());
+    }
+
+    private IEnumerator SubscribeToPlayers()
+    {
+        // Esperar a que todos los objetos estén instanciados
+        yield return new WaitForSeconds(0.5f);
+        Debug.Log("[SERVER] Suscribiendo a los jugadores...");
+        // Suscribirse al evento OnValueChanged de networkPlayerTeam de todos los jugadores
+        foreach (var playerObject in NetworkManager.Singleton.SpawnManager.SpawnedObjectsList)
+        {
+            if (playerObject.TryGetComponent<PlayerTeamSync>(out PlayerTeamSync playerTeamSync))
+            {
+                if (!playerTeamSyncs.Contains(playerTeamSync))
+                {
+                    playerTeamSync.networkPlayerTeam.OnValueChanged += OnAnyPlayerTeamChanged;
+                    playerTeamSyncs.Add(playerTeamSync);
+                }
+            }
+        }
+    }
+
+    private void OnAnyPlayerTeamChanged(PlayerTeamSync.Team previousTeam, PlayerTeamSync.Team newTeam)
+    {
+        Debug.Log("[SERVER] Cambio de equipo detectado...");
+        SetPlayersPerTeam();
+        Debug.Log("[SERVER] Policias: " + policiasPlayers + "  ||  Ladrones: " + ladronesPlayers);
+    }
+
+    public void OnClientConnected(ulong clientId)
+    {
+        Debug.Log($"[SERVER] IsServer: {IsServer}, IsHost: {IsHost}, IsClient: {IsClient}");
+
+        Debug.Log($"[SERVER] Jugador {clientId} conectado, asignando equipo correspondiente");
+
+        StartCoroutine(AssignTeamAfterDelay(clientId));
+        StartCoroutine(SubscribeToPlayers());
+        SetPlayersPerTeam();
+    }
+
+    public IEnumerator AssignTeamAfterDelay(ulong clientId)
+    {
+        if (!IsServer) yield break;
+
+        IReadOnlyDictionary<ulong, NetworkClient> jugadores = NetworkManager.Singleton.ConnectedClients;
+        yield return new WaitForSeconds(.1f);
+        if (policiasPlayers <= ladronesPlayers)
+        {
+            Debug.Log("[SERVER] Asignando equipo Policias a " + jugadores[clientId].PlayerObject.GetComponent<PlayerNameSync>().networkPlayerName.Value);
+            policiasPlayers++;
+            PlayerTeamSync playerTeamSync = jugadores[clientId].PlayerObject.GetComponent<PlayerTeamSync>();
+            playerTeamSync.networkPlayerTeam.Value = PlayerTeamSync.Team.Policias;
+        }
+        else
+        {
+            Debug.Log("[SERVER] Asignando equipo Ladrones a " + jugadores[clientId].PlayerObject.GetComponent<PlayerNameSync>().networkPlayerName.Value);
+            ladronesPlayers++;
+            PlayerTeamSync playerTeamSync = jugadores[clientId].PlayerObject.GetComponent<PlayerTeamSync>();
+            playerTeamSync.networkPlayerTeam.Value = PlayerTeamSync.Team.Ladrones;
+        }
+        yield return new WaitForSeconds(1f);
+    }
+
+    public void OnClientDisconnected(ulong clientId)
+    {
+
     }
 
     public IEnumerator CheckForConnectedPlayers()
@@ -82,7 +153,8 @@ public class HNSMain : NetworkBehaviour
             if (minimumPlayersReached)
             {
                 Debug.Log("Minimum players reached!!!!!");
-                Debug.Log("Start count of 10 seconds to starting...");
+                Debug.Log("[SERVER] Start count of 10 seconds to starting...");
+                currentGameState = GameState.Preparing;
             }
             else
             {
@@ -114,7 +186,7 @@ public class HNSMain : NetworkBehaviour
         }
 
         // Cuando se alcanza el número mínimo, inicia el conteo regresivo
-        Debug.Log("Se alcanzó el número mínimo de jugadores =) (server)");
+        Debug.Log("[SERVER] Se alcanzó el número mínimo de jugadores =)");
         StartCountdownCoroutine();
 
     }
@@ -155,12 +227,14 @@ public class HNSMain : NetworkBehaviour
             segundosRestantes--;
         }
         LogToPlayers("HA COMENZADO HNS.... (PLAYER)");
-        Debug.Log("HA COMENZADO HNS.... (SERVER)");
+        Debug.Log("[SERVER] HA COMENZADO HNS.... (SERVER)");
+
         StartCoroutine(StartGameLogic());
     }
 
     public IEnumerator StartGameLogic()
     {
+        currentGameState = GameState.Starting;
         // Comenzar el juego
         // Teletranpsorta a los jugadores a sus puntos de spawn
         TeleportPlayersToSpawn();
@@ -171,9 +245,10 @@ public class HNSMain : NetworkBehaviour
         // Descongela a los policias
         UnfreezePoliceTeam();
         // Comienza el juego
-        Debug.Log("Partida iniciada!!! CORRAAAN (server)");
+        Debug.Log("[SERVER] Partida iniciada!!! CORRAAAN");
         LogToPlayers("Partida iniciada!!! CORRAAAN (players)");
         SetPlayersTimedCanvasMessage("¡Policías a la caza de los ladrones!", 6f);
+        currentGameState = GameState.Started;
     }
 
     public void FreezePoliceTeam()

@@ -473,7 +473,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0.009, y: 1.132, z: 0.327}
-  m_LocalScale: {x: 0.5226052, y: 0.69882774, z: 0.61510634}
+  m_LocalScale: {x: 0.45006758, y: 0.69882774, z: 0.61510634}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6862303097144135742}
@@ -493,7 +493,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1022158996824244329}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -566,6 +566,8 @@ MonoBehaviour:
   estaCapturado:
     m_InternalValue: 0
   explosionPrefab: {fileID: 3236983653762691514, guid: 0a8efb33a08b34345bac0ff7bd0373b1,
+    type: 3}
+  bloodPrefab: {fileID: 6717547491010711568, guid: ac51669788063b44893e8f3e4229f970,
     type: 3}
 --- !u!1 &1027614751287658355
 GameObject:
@@ -1751,6 +1753,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6862303097144135742}
   - component: {fileID: 7102150311443443921}
+  - component: {fileID: 9046618539004578684}
   - component: {fileID: -955891085962258415}
   - component: {fileID: 1016908964061742803}
   - component: {fileID: 4762525981638343227}
@@ -1818,6 +1821,22 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &9046618539004578684
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4802217115245809297}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3b9a979a4b5e9540b0492fa3558374d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  networkPlayerHealth:
+    m_InternalValue: 100
+  bloodPrefab: {fileID: 6717547491010711568, guid: ac51669788063b44893e8f3e4229f970,
+    type: 3}
 --- !u!114 &-955891085962258415
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2086,9 +2105,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isTeleporting: 0
   isFrozen: 0
-  MoveSpeed: 2
+  MoveSpeed: 3
   isAnimating: 0
-  SprintSpeed: 5.335
+  SprintSpeed: 7
   RotationSmoothTime: 0.08
   SpeedChangeRate: 10
   LandingAudioClip: {fileID: 8300000, guid: ff697d3070687ce4583faa0561a145a2, type: 3}
@@ -2104,10 +2123,10 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 274649b0e221539409070ebf6c18918b, type: 3}
   - {fileID: 8300000, guid: a3194b8bbc96ef84fab1f98f4b7dae3e, type: 3}
   FootstepAudioVolume: 0.3
-  JumpHeight: 1.2
-  Gravity: -15
-  JumpTimeout: 0.3
-  FallTimeout: 0.15
+  JumpHeight: 1.45
+  Gravity: -25
+  JumpTimeout: 0.1
+  FallTimeout: 0.025
   Grounded: 1
   GroundedOffset: -0.14
   GroundedRadius: 0.28

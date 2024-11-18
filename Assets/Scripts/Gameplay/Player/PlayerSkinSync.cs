@@ -35,32 +35,31 @@ public class PlayerSkinSync : NetworkBehaviour
     {
         networkSkinName.OnValueChanged += OnSkinNameChanged;
         playerTeamSync = GetComponent<PlayerTeamSync>();
+        playerTeamSync.networkPlayerTeam.OnValueChanged += OnTeamChanged;
 
         tieneAnimator = TryGetComponent(out animator);
-
 
         if (playerTeamSync == null)
         {
             Debug.LogError("PlayerTeamSync no encontrado en el jugador");
             return;
         }
-        playerTeamSync.networkPlayerTeam.OnValueChanged += OnTeamChanged;
 
-        if (IsOwner)
-        {
-            //if (playerTeamSync.networkPlayerTeam.Value != PlayerTeamSync.Team.SinEquipo)
-            //{
-            //    AssignSkinServerRpc(playerTeamSync.networkPlayerTeam.Value);
-            //}
-            //else
-            //{
-            //    AssignSkinServerRpc();
-            //}
-            AssignSkinServerRpc();
-            //StartCoroutine(CheckMySkin());
-            StartCoroutine(WaitAndInitializeUI());
+        //if (IsOwner)
+        //{
+        //    //if (playerTeamSync.networkPlayerTeam.Value != PlayerTeamSync.Team.SinEquipo)
+        //    //{
+        //    //    AssignSkinServerRpc(playerTeamSync.networkPlayerTeam.Value);
+        //    //}
+        //    //else
+        //    //{
+        //    //    AssignSkinServerRpc();
+        //    //}
+        //    AssignSkinServerRpc();
+        //    //StartCoroutine(CheckMySkin());
+        //    StartCoroutine(WaitAndInitializeUI());
 
-        }
+        //}
 
         //if (playerTeamSync.networkPlayerTeam.Value != PlayerTeamSync.Team.SinEquipo)
         //{
@@ -87,8 +86,8 @@ public class PlayerSkinSync : NetworkBehaviour
             }
         }
         // Actualizar la skin inicial
-        ActualizarSkin(networkSkinName.Value.Value);
         */
+        ActualizarSkin(networkSkinName.Value.Value);
     }
     private void OnDestroy()
     {

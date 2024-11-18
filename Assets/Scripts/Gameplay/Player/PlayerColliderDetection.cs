@@ -1,9 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using TMPro;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class PlayerColliderDetection : NetworkBehaviour
 {
@@ -12,8 +10,39 @@ public class PlayerColliderDetection : NetworkBehaviour
 
     private List<ulong> isTargetingTo = new List<ulong>();
     private List<ulong> isTargetedBy = new List<ulong>();
+    private Dictionary<ulong, NetworkObject> playerObjects = new Dictionary<ulong, NetworkObject>();
 
     public GameObject explosionPrefab;
+    public GameObject bloodPrefab;
+
+    private void Awake()
+    {
+        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+        NetworkManager.Singleton.OnClientConnectedCallback += OnClientDisconnected;
+    }
+
+    private void OnClientConnected(ulong clientId)
+    {
+        foreach (var playerObject in NetworkManager.Singleton.SpawnManager.SpawnedObjectsList)
+        {
+            if (playerObject.TryGetComponent<PlayerTeamSync>(out PlayerTeamSync playerTeamSync))
+            {
+                if (!playerObjects.ContainsKey(playerObject.OwnerClientId))
+                {
+                    playerObjects.Add(playerObject.OwnerClientId, playerObject);
+                }
+            }
+        }
+    }
+
+    private void OnClientDisconnected(ulong clientId)
+    {
+        // Quitar el jugador del dictionary playerObjects
+        if (playerObjects.ContainsKey(clientId))
+        {
+            playerObjects.Remove(clientId);
+        }
+    }
 
     private void Start()
     {
@@ -22,6 +51,16 @@ public class PlayerColliderDetection : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        // Obtener todos los jugadores
+        foreach (var playerObject in NetworkManager.Singleton.SpawnManager.SpawnedObjectsList)
+        {
+            if (playerObject.TryGetComponent<PlayerTeamSync>(out PlayerTeamSync playerTeamSync))
+            {
+                ulong clientId = playerObject.OwnerClientId;
+
+                playerObjects.Add(clientId, playerObject);
+            }
+        }
         base.OnNetworkSpawn();
         Debug.Log("Valor inicial isTargetingTo: " + string.Join(", ", isTargetingTo));
     }
@@ -45,7 +84,27 @@ public class PlayerColliderDetection : NetworkBehaviour
         if (isTargetingTo != null && isTargetingTo.Count != 0)
         {
             Debug.Log("Interactuando con el jugador: " + string.Join(", ", isTargetingTo));
-            InteraccionServerRpc(isTargetingTo[0]);
+            try
+            {
+
+                InteraccionServerRpc(isTargetingTo[0]);
+            }catch (System.Exception e)
+            {
+                Debug.LogError("Error en Interact(): " + e.Message);
+            }
+            // Obtener objeto del jugador targeteado
+
+            if (playerObjects.ContainsKey(isTargetingTo[0]))
+            {
+
+                NetworkObject jugadorTargeteado = playerObjects[isTargetingTo[0]];
+                Vector3 targetPosition = jugadorTargeteado.transform.position;
+                targetPosition.y += 1;
+
+
+                GameObject blood = Instantiate(bloodPrefab, targetPosition, Quaternion.identity);
+                Destroy(blood, 2f);
+            }
         }
         else
         {
@@ -58,12 +117,22 @@ public class PlayerColliderDetection : NetworkBehaviour
         if (!IsOwner)
             return;
 
+        if (other.gameObject.GetComponentInParent<NetworkObject>() == null
+            || other.gameObject.GetComponentInParent<NetworkObject>().OwnerClientId.Equals(OwnerClientId))
+            return;
+
         ulong otherClientId = other.gameObject.GetComponentInParent<NetworkObject>().OwnerClientId;
 
-        Debug.Log(Equals(otherClientId, OwnerClientId) ? "Colision conmigo mismo" : "Colision con otro jugador");
+        string otherPlayerName = other.gameObject.GetComponentInParent<PlayerNameSync>().networkPlayerName.Value.ToString();
+        PlayerTeamSync.Team ownerTeam = player.GetComponent<PlayerTeamSync>().networkPlayerTeam.Value;
+        PlayerTeamSync.Team otherPlayerTeam = other.gameObject.GetComponentInParent<PlayerTeamSync>().networkPlayerTeam.Value;
+
+        //Debug.Log(Equals(otherClientId, OwnerClientId) ? "Colision conmigo mismo" : "Colision con otro jugador");
 
         //// Verificar si ya está en la lista antes de agregarlo
-        if (!isTargetingTo.Contains(otherClientId) && !otherClientId.Equals(OwnerClientId))
+        if (!isTargetingTo.Contains(otherClientId)
+            && !otherClientId.Equals(OwnerClientId)
+            && otherPlayerTeam != ownerTeam)
         {
             isTargetingTo.Add(otherClientId);
         }
@@ -72,9 +141,6 @@ public class PlayerColliderDetection : NetworkBehaviour
         //TODO: en caso de que hayan varios isTargettingTo, que se setee el más cercano
 
 
-        string otherPlayerName = other.gameObject.GetComponentInParent<PlayerNameSync>().networkPlayerName.Value.ToString();
-        PlayerTeamSync.Team ownerTeam = player.GetComponent<PlayerTeamSync>().networkPlayerTeam.Value;
-        PlayerTeamSync.Team otherPlayerTeam = other.gameObject.GetComponentInParent<PlayerTeamSync>().networkPlayerTeam.Value;
 
         if (otherPlayerTeam == PlayerTeamSync.Team.Ladrones)
         {
@@ -128,26 +194,55 @@ public class PlayerColliderDetection : NetworkBehaviour
     private void InteraccionServerRpc(ulong interactedPlayerId, ServerRpcParams rpcParams = default)
     {
         ulong clientId = rpcParams.Receive.SenderClientId;
-
+        Vector3 targetPosition;
         if (NetworkManager.Singleton.ConnectedClients.TryGetValue(interactedPlayerId, out var interactedPlayer))
         {
             NetworkObject interactedPlayerObject = interactedPlayer.PlayerObject;
-            Vector3 targetPosition = interactedPlayerObject.transform.position;
+            targetPosition = interactedPlayerObject.transform.position;
 
             Debug.Log($"[SERVER] Jugador {clientId} interactuando con {interactedPlayer}");
-
-            // sumar una unidad de altura para que la explosión no esté en el suelo
             targetPosition.y += 1;
 
-            GameObject explosion = Instantiate(explosionPrefab, targetPosition, Quaternion.identity);
+            //InstanciarSangreClientRpc(targetPosition, new ClientRpcParams
+            //{
+            //    Send = new ClientRpcSendParams
+            //    {
+            //        TargetClientIds = NetworkManager.Singleton.ConnectedClients.Keys.Where(id => id != clientId).ToArray()
+            //    }
+            //});
+            GameObject blood = Instantiate(bloodPrefab, targetPosition, Quaternion.identity);
 
-            NetworkObject explosionNetworkObject = explosion.GetComponent<NetworkObject>();
-            explosionNetworkObject.Spawn();
+            NetworkObject bloodNetworkObject = blood.GetComponent<NetworkObject>();
+            bloodNetworkObject.Spawn();
+
+            interactedPlayerObject.GetComponent<PlayerHealthSync>().
+                networkPlayerHealth.Value -= PlayerHealthSync.Damage;
         }
         else
         {
             Debug.Log($"[SERVER] No se encontró al player con el clientId {interactedPlayerId}");
         }
+    }
+
+    [ClientRpc]
+    private void InstanciarSangreClientRpc(Vector3 position, ClientRpcParams clientRpcParams = default)
+    {
+        GameObject blood = Instantiate(bloodPrefab, position, Quaternion.identity);
+        Destroy(blood, 2f);
+    }
+    private void DisminuirVidaJugador(int cantidad, ulong interactedPlayerId)
+    {
+
+        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(interactedPlayerId, out var interactedPlayer))
+        {
+            Debug.Log("Disminuyendo vida del jugador " + interactedPlayerId);
+            NetworkObject interactedPlayerObject = interactedPlayer.PlayerObject;
+        }
+        else
+        {
+            Debug.Log($"[SERVER] No se encontró al player con el clientId {interactedPlayerId}");
+        }
+
     }
 
 

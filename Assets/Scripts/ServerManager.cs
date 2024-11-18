@@ -73,18 +73,25 @@ public class ServerManager : NetworkBehaviour
 
         Debug.Log("Server started as HOST MODE");
         HNSMain.Instance.StartHNSMain();
-        StartCoroutine(PingearClientes());
+        connectedPlayersCount.Value = NetworkManager.Singleton.ConnectedClients.Count;
+        //StartCoroutine(PingearClientes());
     }
 
     public void OnClientConnected(ulong idConexion)
     {
-        Debug.Log(idConexion + " se ha conectado");
-        connectedPlayersCount.Value = NetworkManager.Singleton.ConnectedClients.Count;
+        if (IsServer)
+        {
+            Debug.Log(idConexion + " se ha conectado");
+            connectedPlayersCount.Value = NetworkManager.Singleton.ConnectedClients.Count;
+        }
     }
     public void OnClientDisconnected(ulong idConexion)
     {
-        Debug.Log(idConexion + " se ha desconectado");
-        connectedPlayersCount.Value = NetworkManager.Singleton.ConnectedClients.Count;
+        if (IsServer)
+        {
+            Debug.Log(idConexion + " se ha desconectado");
+            connectedPlayersCount.Value = NetworkManager.Singleton.ConnectedClients.Count;
+        }
     }
     public IEnumerator PingearClientes()
     {
@@ -94,7 +101,8 @@ public class ServerManager : NetworkBehaviour
             //Debug.Log("Enviando ping....");
             //PingClientRpc();
             //Debug.Log("Alternando equipos!");
-            AlternarEquipos();
+            //AlternarEquipos();
+            //DisminuirVidaJugadores();
         }
     }
     //si funciona
@@ -122,6 +130,15 @@ public class ServerManager : NetworkBehaviour
         foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
         {
             TeamsManager.Instance.SwitchTeam(client.ClientId);
+        }
+    }
+
+    public void DisminuirVidaJugadores()
+    {
+        foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
+        {
+            Debug.Log("Disminuyendo vida");
+            client.PlayerObject.GetComponent<PlayerHealthSync>().networkPlayerHealth.Value -= 10;
         }
     }
 }

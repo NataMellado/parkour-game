@@ -156,10 +156,13 @@ public class ChangeTeamMenu : MonoBehaviour
         switch (buttonName)
         {
             case "selectTeam1":
+                ChangeTeamScript.Instance.SolicitarCambioEquipoServerRpc(PlayerTeamSync.Team.Ladrones);
                 break;
             case "selectTeam2":
+                ChangeTeamScript.Instance.SolicitarCambioEquipoServerRpc(PlayerTeamSync.Team.Policias);
                 break;
             case "selectTeam3":
+                ChangeTeamScript.Instance.SolicitarCambioEquipoServerRpc(PlayerTeamSync.Team.SinEquipo);
                 break;
         }
     }

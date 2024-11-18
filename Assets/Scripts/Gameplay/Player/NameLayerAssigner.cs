@@ -4,63 +4,66 @@ using Unity.Netcode;
 
 public class NameLayerAssigner : NetworkBehaviour
 {
-    private PlayerTeamSync.Team localTeam;
-    private bool isPlayerConnected;
-
-    void Start()
+    public void Start()
     {
         Debug.Log("Start NameLayerAssigner");
         if (IsClient && IsOwner)
         {
             Debug.Log("IsClient && IsOwner");
-            // Obtener el equipo del jugador local
-            localTeam = GetComponent<PlayerTeamSync>().networkPlayerTeam.Value;
 
             // Iniciar la corrutina para actualizar las capas
-            StartCoroutine(UpdateNameLayers());
+            //StartCoroutine(UpdateNameLayers());
         }
+
+        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
     }
 
-    IEnumerator UpdateNameLayers()
+    private void OnClientConnected(ulong clientId)
     {
-        while (true)
+        //UpdateNameLayers();
+    }
+
+    public IEnumerator UpdateNameLayers()
+    {
+        // Obtener todos los jugadores
+        Debug.Log("Actualizando capas de nombres...");
+        foreach (var playerObject in NetworkManager.Singleton.SpawnManager.SpawnedObjectsList)
         {
-            // Obtener todos los jugadores
-            foreach (var playerObject in NetworkManager.Singleton.SpawnManager.SpawnedObjectsList)
+            if (playerObject.TryGetComponent<PlayerTeamSync>(out PlayerTeamSync playerTeamSync))
             {
-                if (playerObject.TryGetComponent<PlayerTeamSync>(out PlayerTeamSync playerTeamSync))
+                // Obtener el equipo del jugador
+                PlayerTeamSync.Team playerTeam = playerTeamSync.networkPlayerTeam.Value;
+                // Obtener GameObject con el nombre PlayerNameItems
+                GameObject playerTeamText = playerTeamSync.nombreEquipoText.gameObject;
+                GameObject playerNameText = playerObject.GetComponent<PlayerNameSync>().nombreJugadorText.gameObject;
+
+                //Asignar la capa adecuada al nombre
+                if (playerObject.OwnerClientId == OwnerClientId)
                 {
-                    // Obtener el equipo del jugador
-                    PlayerTeamSync.Team playerTeam = playerTeamSync.networkPlayerTeam.Value;
-                    // Obtener GameObject con el nombre PlayerNameItems
-                    GameObject playerTeamText = playerTeamSync.nombreEquipoText.gameObject;
-                    GameObject playerNameText = playerObject.GetComponent<PlayerNameSync>().nombreJugadorText.gameObject;
-
-                     //Asignar la capa adecuada al nombre
-                    if (playerObject.OwnerClientId == OwnerClientId)
-                    {
-                        // Nombre del propio jugador
-                        SetLayer(playerTeamText, LayerMask.NameToLayer("OwnName"));
-                        SetLayer(playerNameText, LayerMask.NameToLayer("OwnName"));
-                    }
-                    else if (playerTeam == localTeam)
-                    {
-                        // Compañero de equipo
-                        SetLayer(playerTeamText, LayerMask.NameToLayer("TeammateNames"));
-                        SetLayer(playerNameText, LayerMask.NameToLayer("TeammateNames"));
-                    }
-                    else
-                    {
-                        // Jugador del equipo contrario
-                        SetLayer(playerTeamText, LayerMask.NameToLayer("EnemyNames"));
-                        SetLayer(playerNameText, LayerMask.NameToLayer("EnemyNames"));
-                    }
+                    // Nombre del propio jugador
+                    SetLayer(playerTeamText, LayerMask.NameToLayer("OwnName"));
+                    SetLayer(playerNameText, LayerMask.NameToLayer("OwnName"));
                 }
+                else if (playerTeam == GetComponent<PlayerTeamSync>().networkPlayerTeam.Value)
+                {
+                    // Compañero de equipo
+                    SetLayer(playerTeamText, LayerMask.NameToLayer("TeammateNames"));
+                    SetLayer(playerNameText, LayerMask.NameToLayer("TeammateNames"));
+                }
+                else
+                {
+                    // Jugador del equipo contrario
+                    SetLayer(playerTeamText, LayerMask.NameToLayer("EnemyNames"));
+                    SetLayer(playerNameText, LayerMask.NameToLayer("EnemyNames"));
+                }
+                Debug.Log("equipo del jugador otro: " + playerTeam.ToString());
+                Debug.Log("mi equipo: " + GetComponent<PlayerTeamSync>().networkPlayerTeam.Value.ToString());
             }
-
-            // Esperar un tiempo antes de volver a actualizar
-            yield return new WaitForSeconds(1f);
         }
+
+
+        // Esperar un tiempo antes de volver a actualizar
+        yield return new WaitForSeconds(1f);
     }
 
     void SetLayer(GameObject obj, int newLayer)

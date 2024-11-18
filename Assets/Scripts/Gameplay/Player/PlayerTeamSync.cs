@@ -23,10 +23,10 @@ public class PlayerTeamSync : NetworkBehaviour
     }
     public class Equipo
     {
-        public Team Team { get; private set;}
-        public string TeamName { get; private set;}
+        public Team Team { get; private set; }
+        public string TeamName { get; private set; }
         public string TeamPrefix { get; private set; }
-        public Color TeamColor { get; private set;}
+        public Color TeamColor { get; private set; }
 
         public Equipo(Team team, string teamName, string teamPrefix, Color teamColor)
         {
@@ -57,15 +57,18 @@ public class PlayerTeamSync : NetworkBehaviour
     [SerializeField]
     public TextMeshPro nombreEquipoText;
 
+    private NameLayerAssigner nameLayerAssigner;
+
     public override void OnNetworkSpawn()
     {
+        nameLayerAssigner = GetComponent<NameLayerAssigner>();
         networkPlayerTeam.OnValueChanged += OnTeamChanged;
-        if (IsOwner)
-        {
-            Debug.Log("Asignando equipo");
-            AssignTeamServerRpc();
-            //StartCoroutine(CheckMyTeam());
-        }
+        //if (IsOwner)
+        //    //{
+        //    //    Debug.Log("Asignando equipo");
+        //    //    AssignTeamServerRpc();
+        //    StartCoroutine(CheckMyTeam());
+        //}
         /*
         else
         {
@@ -76,7 +79,20 @@ public class PlayerTeamSync : NetworkBehaviour
             }
         }*/
         StartCoroutine(WaitAndInitializeUI());
+        if (IsOwner)
+            StartCoroutine(UpdateNameLayers());
     }
+
+    private void OnEnable()
+    {
+        networkPlayerTeam.OnValueChanged += OnTeamChanged;
+    }
+
+    private void OnDisable()
+    {
+        networkPlayerTeam.OnValueChanged -= OnTeamChanged;
+    }
+
     private void OnDestroy()
     {
         // Desuscribirse del evento
@@ -88,14 +104,16 @@ public class PlayerTeamSync : NetworkBehaviour
         // Esperar un frame para asegurar que las NetworkVariables estén sincronizadas
         yield return null;
 
-        if (networkPlayerTeam.Value != Team.SinEquipo)
-        {
-            UpdateTeamUI(networkPlayerTeam.Value);
-        }
+        //if (networkPlayerTeam.Value != Team.SinEquipo)
+        //{
+        //    UpdateTeamUI(networkPlayerTeam.Value);
+        //}
+        UpdateTeamUI(networkPlayerTeam.Value);
     }
     private IEnumerator CheckMyTeam()
     {
-        while (true) {
+        while (true)
+        {
             //Debug.LogWarning("CheckMyTeam: " + OwnerClientId + " -> " + networkPlayerTeam.Value);
             yield return new WaitForSeconds(2);
         };
@@ -135,7 +153,8 @@ public class PlayerTeamSync : NetworkBehaviour
                 Debug.LogError($"[SERVER] ConnectedClients no contiene clientId: {clientId}");
             }
             //Debug.Log("[SERVER] Equipo asignado" + " a ID[" + clientId + "]: " + networkPlayerTeam.Value);
-        } catch (System.Exception e)
+        }
+        catch (System.Exception e)
         {
             Debug.LogError($"[SERVER] Error en AssignTeamServerRpc(): {e.Message}");
         }
@@ -157,12 +176,104 @@ public class PlayerTeamSync : NetworkBehaviour
     private void OnTeamChanged(Team previousTeam, Team newTeam)
     {
         UpdateTeamUI(newTeam);
+        //NotifyTeamChangedServerRpc();
     }
 
+    [ServerRpc(RequireOwnership = false)]
+    public void NotifyTeamChangedServerRpc(ServerRpcParams rpcParams = default)
+    {
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        foreach (GameObject player in players)
+        {
+            PlayerTeamSync playerTeamSync = player.GetComponent<PlayerTeamSync>();
+            if (playerTeamSync != null)
+            {
+                playerTeamSync.UpdateMyTeamLayers();
+            }
+        }
+    }
+
+    public void UpdateMyTeamLayers()
+    {
+        if (IsOwner)
+            StartCoroutine(UpdateNameLayers());
+    }
+
+    public IEnumerator UpdateNameLayers()
+    {
+        yield return null;
+        Debug.Log("Actualizando capas de nombres...");
+        Debug.Log("Mi cliente ID: " + OwnerClientId);
+        // esperar un frame para asegurar que los objetos de texto estén sincronizados
+        foreach (var playerObject in NetworkManager.Singleton.SpawnManager.SpawnedObjectsList)
+        {
+            if (playerObject.TryGetComponent<PlayerTeamSync>(out PlayerTeamSync playerTeamSync))
+            {
+                // Obtener el equipo del jugador actual
+                PlayerTeamSync.Team playerTeam = playerTeamSync.networkPlayerTeam.Value;
+                // Obtener el equipo del jugador local dado su LocalClientId:
+                
+                Team localPlayerTeam = GetComponent<PlayerTeamSync>().networkPlayerTeam.Value;
+                Debug.Log($"Mi equipo: {localPlayerTeam}");
+                // Obtener los objetos de texto
+                GameObject playerTeamText = playerTeamSync.nombreEquipoText.gameObject;
+                GameObject playerNameText = playerObject.GetComponent<PlayerNameSync>().nombreJugadorText.gameObject;
+
+                if (playerObject.IsLocalPlayer)
+                {
+                    // Nombre del propio jugador
+                    SetLayer(playerTeamText, LayerMask.NameToLayer("OwnName"));
+                    SetLayer(playerNameText, LayerMask.NameToLayer("OwnName"));
+                    Debug.Log(playerObject.GetComponent<PlayerNameSync>().networkPlayerName.Value + $" soy yo jaja");
+                }
+                else if (playerTeam == localPlayerTeam)
+                {
+                    // Compañero de equipo
+                    SetLayer(playerTeamText, LayerMask.NameToLayer("TeammateNames"));
+                    SetLayer(playerNameText, LayerMask.NameToLayer("TeammateNames"));
+                    Debug.Log(playerObject.GetComponent<PlayerNameSync>().networkPlayerName.Value + $" es compañero");
+                }
+                else
+                {
+                    // Jugador del equipo contrario
+                    SetLayer(playerTeamText, LayerMask.NameToLayer("EnemyNames"));
+                    SetLayer(playerNameText, LayerMask.NameToLayer("EnemyNames"));
+                    Debug.Log(playerObject.GetComponent<PlayerNameSync>().networkPlayerName.Value + $" es enemigo");
+                }
+            }
+        }
+
+        // Opcional: Esperar un tiempo antes de volver a actualizar
+        yield return new WaitForSeconds(0.2f);
+    }
+
+    void SetLayer(GameObject obj, int newLayer)
+    {
+        if (obj == null)
+            return;
+
+        obj.layer = newLayer;
+
+    }
+    void SetLayerRecursively(GameObject obj, int newLayer)
+    {
+        if (obj == null)
+            return;
+
+        obj.layer = newLayer;
+
+        foreach (Transform child in obj.transform)
+        {
+            if (child == null)
+                continue;
+
+            SetLayerRecursively(child.gameObject, newLayer);
+        }
+    }
     private void UpdateTeamUI(Team team)
     {
         // Implementar la lógica para actualizar la UI con el equipo del jugador
-        
+
         if (nombreEquipoText != null)
         {
             nombreEquipoText.text = team.ToString();
@@ -181,7 +292,8 @@ public class PlayerTeamSync : NetworkBehaviour
                     nombreEquipoText.color = Equipos.equipos[Team.SinEquipo].TeamColor;
                     break;
             }
-        }else
+        }
+        else
         {
             Debug.LogWarning("nombreEquipoText no está asignado en " + gameObject.name);
         }

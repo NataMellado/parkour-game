@@ -31,6 +31,9 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI messageTextBox;
 
+    [SerializeField]
+    private TextMeshProUGUI healthTextBox;
+
     public TMP_InputField playerNameInputField;
 
     private GameManager gameManager;
@@ -87,7 +90,7 @@ public class UIManager : MonoBehaviour
         // TODO: Arreglar lógica de handling
         if (Connected)
         {
-            Debug.LogWarning("Jugador conectado");
+            //Debug.LogWarning("Jugador conectado");
             isConnected = true;
             if (isConnected)
             {
@@ -106,7 +109,7 @@ public class UIManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("Jugador desconectado");
+            //Debug.LogWarning("Jugador desconectado");
             // Jugador desconectado
             isConnected = false;
             pauseMenu = true;
@@ -164,7 +167,7 @@ public class UIManager : MonoBehaviour
     {
         if (isConnecting)
             return;
-        Debug.Log("Connect clicked");
+        //Debug.Log("Connect clicked");
 
         // Check if server ip input field is empty
         if (gameManager.serverIpText.text.ToString().Trim() == "" ||
@@ -182,7 +185,7 @@ public class UIManager : MonoBehaviour
         if (!isConnected)
             return;
 
-        Debug.Log("Disconnect clicked");
+        //Debug.Log("Disconnect clicked");
 
         gameManager.Disconnect();
     }
@@ -197,7 +200,7 @@ public class UIManager : MonoBehaviour
     }
     private void SwitchToGameCamera()
     {
-        Debug.Log("Switching to game camera");
+        //Debug.Log("Switching to game camera");
         // Cambiar cámaras
         gameCamera.gameObject.SetActive(true);
         gameCamera.GetComponent<AudioListener>().enabled = true;
@@ -209,7 +212,7 @@ public class UIManager : MonoBehaviour
 
     private void SwitchToMenuCamera()
     {
-        Debug.Log("Switching to menu camera");
+        //Debug.Log("Switching to menu camera");
         menuCamera.gameObject.SetActive(true);
         // Habilitar audio listener de la cámara
         menuCamera.GetComponent<AudioListener>().enabled = true;
@@ -248,7 +251,7 @@ public class UIManager : MonoBehaviour
         // Si presiona la tecla A, el cursor se muestra
         if (Input.GetKeyDown(toggleKey) && isConnected)
         {
-            Debug.Log("Toggle pause menu");
+            //Debug.Log("Toggle pause menu");
             togglePauseMenu();
         }
 
@@ -306,5 +309,9 @@ public class UIManager : MonoBehaviour
         messageTextBoxCanvas.gameObject.SetActive(false);
     }
 
+    public void SetHealthText(int health)
+    {
+        healthTextBox.text = health.ToString();
+    }
 }
 

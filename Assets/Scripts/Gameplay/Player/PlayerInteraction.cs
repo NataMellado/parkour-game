@@ -52,7 +52,7 @@ public class PlayerInteraction : NetworkBehaviour
     private IEnumerator DeactivatePunching(float stateInfoLength)
     {
         yield return new WaitForSeconds(stateInfoLength);
-        Debug.Log("Deactivate Punching");
+        //Debug.Log("Deactivate Punching");
         animator.SetLayerWeight(upperBodyLayerIndex, 0);
         isPunching = false;
     }
@@ -69,18 +69,18 @@ public class PlayerInteraction : NetworkBehaviour
     public void OnPunchHit()
     {
         if (!IsOwner) { return; }
-        Debug.Log("Golpe efectivo registrado");
+        //Debug.Log("Golpe efectivo registrado");
         playerColliderDetection.Interact();
     }
     public void OnPunchStart()
     {
 
-        Debug.Log("Golpe comenzado");
+        //Debug.Log("Golpe comenzado");
     }
     public void OnPunchEnd()
     {
 
-        Debug.Log("Golpe terminado");
+        //Debug.Log("Golpe terminado");
     }
     void Update()
     {
